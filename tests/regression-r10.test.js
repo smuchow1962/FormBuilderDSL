@@ -8,10 +8,13 @@
 //   5.2   TextFormBuilder default export is gone (named only).
 //   5.5   validateProperties splits null-AST from missing-root.
 //   5.6   inferDataSchema sources are sorted by line.
-//   Q8.3  package version is 1.1.0; VERSION export matches.
+//   Q8.3  VERSION export stays in sync with package.json.
 
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
 
 import {
     TextFormBuilder,
@@ -21,6 +24,9 @@ import {
     validateProperties,
     VERSION
 } from '../src/index.js';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const pkg = JSON.parse(readFileSync(join(__dirname, '..', 'package.json'), 'utf8'));
 
 // ─── 3.1 compute= must be a function ──────────────────────────────────────
 
@@ -202,8 +208,8 @@ tooltips = [help = "value: {x}"]
 
 // ─── Q8.3 version bump ───────────────────────────────────────────────────
 
-test("Q8.3 VERSION export is 1.1.0", () => {
-    assert.equal(VERSION, '1.1.0');
+test("Q8.3 VERSION export matches package.json", () => {
+    assert.equal(VERSION, pkg.version);
 });
 
 // ─── Sanity: existing compute consumer still works through inferSchema ───

@@ -29,7 +29,7 @@ Pin a **version** instead of `@latest` when you care about stable builds.
 Notes:
 
 - **`+esm`** tells jsDelivr to wrap the package so browsers can `import` it.
-- Replace **`1.1.0`** with the version you see on [npm](https://www.npmjs.com/package/@mmpworks/formbuilder-dsl). Pin a specific version when you want stable behaviour across deployments.
+- Replace the pinned version with the one you see on [npm](https://www.npmjs.com/package/@mmpworks/formbuilder-dsl). Pin a specific version when you want stable behaviour across deployments.
 
 ### unpkg (example pattern)
 

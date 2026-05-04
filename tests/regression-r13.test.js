@@ -26,6 +26,7 @@ import {
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot  = join(__dirname, '..');
 const readDoc = (relPath) => readFileSync(join(repoRoot, relPath), 'utf8');
+const pkg = JSON.parse(readFileSync(join(repoRoot, 'package.json'), 'utf8'));
 
 // ─── M3 parser-produced bodies are prototype-free ────────────────────────
 
@@ -102,7 +103,7 @@ test("D2 docs/library-uses-in-code.md uses the scoped package name and the curre
     // Every package mention should be the scoped name.
     assert.equal(text.includes("'formbuilder-dsl'"),                  false, 'unscoped quoted import name still in doc');
     assert.equal(text.includes('formbuilder-dsl@0.0.1'),               false, 'stale 0.0.1 version pin still in doc');
-    assert.ok(text.includes('@mmpworks/formbuilder-dsl@1.1.0'),        '1.1.0 pin missing from doc');
+    assert.ok(text.includes(`@mmpworks/formbuilder-dsl@${pkg.version}`), `${pkg.version} pin missing from doc`);
     assert.ok(text.includes("'@mmpworks/formbuilder-dsl'"),            'scoped quoted import name missing from doc');
 });
 
