@@ -84,19 +84,6 @@ jobs:
       - name: Smoke test staged bundle
         run: python tools/npm-test.py
 
-      # TEMPORARY DIAGNOSTIC: dump the OIDC token's claims so we can
-      # compare them to the npm trusted-publisher config. The runner
-      # exposes ACTIONS_ID_TOKEN_REQUEST_TOKEN/URL automatically when
-      # id-token: write is set; jq + base64 are preinstalled on
-      # ubuntu-latest. Remove this step once the publish works.
-      - name: Debug OIDC claims
-        run: |
-          TOKEN=$(curl -sLS -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
-            "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=npm:registry.npmjs.org" | jq -r .value)
-          PAYLOAD=$(echo "$TOKEN" | cut -d. -f2)
-          PAYLOAD="${PAYLOAD}$(printf '=%.0s' $(seq 1 $(( (4 - ${#PAYLOAD} % 4) % 4 ))))"
-          echo "$PAYLOAD" | tr '_-' '/+' | base64 -d | jq .
-
       # --provenance attaches a build attestation; the OIDC token from
       # the id-token: write permission is what npm exchanges with the
       # trusted-publisher config to authorize the publish. No
