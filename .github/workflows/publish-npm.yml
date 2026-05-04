@@ -32,20 +32,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Node 24 ships with npm 11.x. Trusted publishing's *auth* path
+      # (using the OIDC token for the actual PUT, not just for sigstore
+      # provenance signing) was added in npm 11.5.1 — the LTS Node 22
+      # bundles npm 10.x, which falls back to NODE_AUTH_TOKEN auth and
+      # 404s when neither is set. This workflow only runs the publish
+      # path, so the Node version here is independent of the matrix the
+      # CI workflow tests against.
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '24'
           registry-url: 'https://registry.npmjs.org'
 
-      # Node 22 ships with npm 10.x, which signs provenance but does NOT
-      # use the OIDC token for the PUT to the registry — it falls back
-      # to NODE_AUTH_TOKEN auth, which we deliberately don't set under
-      # trusted publishing. npm 11.5.1+ does the OIDC handshake for the
-      # publish itself. Upgrading explicitly avoids that mismatch.
-      - name: Upgrade npm for trusted publishing
-        run: |
-          npm install -g npm@latest
-          npm --version
+      - name: Show npm version
+        run: npm --version
 
       - uses: actions/setup-python@v5
         with:
