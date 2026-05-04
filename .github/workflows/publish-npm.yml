@@ -37,6 +37,16 @@ jobs:
           node-version: '22'
           registry-url: 'https://registry.npmjs.org'
 
+      # Node 22 ships with npm 10.x, which signs provenance but does NOT
+      # use the OIDC token for the PUT to the registry — it falls back
+      # to NODE_AUTH_TOKEN auth, which we deliberately don't set under
+      # trusted publishing. npm 11.5.1+ does the OIDC handshake for the
+      # publish itself. Upgrading explicitly avoids that mismatch.
+      - name: Upgrade npm for trusted publishing
+        run: |
+          npm install -g npm@latest
+          npm --version
+
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
