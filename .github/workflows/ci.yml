@@ -72,11 +72,11 @@ jobs:
       - name: Install
         run: npm ci
 
-      # One c8 invocation produces both the text + lcov reports and
-      # enforces the package.json:c8 thresholds. Running tests once
-      # keeps CI fast; the threshold gate is what decides pass/fail.
-      - name: Coverage (lcov + threshold gate)
-        run: npx c8 --reporter=text --reporter=lcov --check-coverage npm test
+      # The script enforces the package.json:c8 thresholds and emits an
+      # lcov report in one pass. The threshold gate is what decides
+      # pass/fail; the lcov report is what the next step uploads.
+      - name: Coverage gate
+        run: npm run test:coverage:check
 
       # Public-repo upload — no token required. fail_ci_if_error stays
       # false so a Codecov outage or rate-limit doesn't sink an

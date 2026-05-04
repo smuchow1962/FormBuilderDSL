@@ -51,7 +51,7 @@
     "test:smoke": "node tests/smoke.js",
     "test:properties": "node tests/properties.js",
     "test:coverage": "c8 --reporter=text --reporter=lcov --reporter=html npm test",
-    "test:coverage:check": "c8 --reporter=text --check-coverage npm test"
+    "test:coverage:check": "c8 --reporter=text --reporter=lcov --check-coverage npm test"
   },
   "c8": {
     "all": true,
