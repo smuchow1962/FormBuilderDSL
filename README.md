@@ -22,53 +22,7 @@ maps to real UI in whatever stack you already use.
 The same parsed AST can feed a public portal, an internal ops
 console, and a partner-facing tool. One definition, many surfaces.
 
-## Install
-
-```bash
-npm install @mmpworks/formbuilder-dsl
-```
-
-Requires Node.js 18+ or any browser bundler that understands ESM
-imports. The package targets V8-based runtimes (Node, Chrome, Edge):
-the `INTERNAL_ERROR` stack-trace path scrub assumes V8's stack
-frame format. A SpiderMonkey or JavaScriptCore host would still
-parse correctly, but file URLs in `INTERNAL_ERROR` messages land
-unscrubbed.
-
-## Quick start
-
-```js
-import { TextFormBuilder, ERR } from '@mmpworks/formbuilder-dsl';
-
-const schemaText = `
-columns: 10
-
-levels = ["Debug", "Info", "Warn"] -> {logLevel}
-
-[container({title})]
-  - [select(5,#levels,{logLevel})] Log level
-`;
-
-const result = new TextFormBuilder({ schemaText }).parse();
-
-if (result.error !== ERR.OK) {
-  console.error(result.messages.join('\n'));
-} else {
-  // result.payload is the AST. Pass it to your renderer.
-  console.log(JSON.stringify(result.payload, null, 2));
-}
-```
-
-To reuse one builder across two source strings, call
-`setSchemaText` instead of constructing a new builder each time:
-
-```js
-const builder = new TextFormBuilder({ schemaText: source1 });
-const r1 = builder.parse();
-
-builder.setSchemaText(source2);
-const r2 = builder.parse();
-```
+![FormBuilderDSL viewer with editor/samples/full-example.mmpform loaded — left pane is the .mmpform source with syntax highlighting, right pane is the Vue 3 / Vuetify 3 dark-theme render](docs/assets/screenshots/viewer-full-example.png)
 
 ## What this solves
 
@@ -175,6 +129,54 @@ tree (containers, rows, controls, option sources). The consumer
 supplies the data object, optional functions, and a component map.
 Reserved words, error codes, and module layout are documented in
 [`docs/architecture.md` on GitHub](https://github.com/smuchow1962/FormBuilderDSL/blob/main/docs/architecture.md).
+
+## Install
+
+```bash
+npm install @mmpworks/formbuilder-dsl
+```
+
+Requires Node.js 18+ or any browser bundler that understands ESM
+imports. The package targets V8-based runtimes (Node, Chrome, Edge):
+the `INTERNAL_ERROR` stack-trace path scrub assumes V8's stack
+frame format. A SpiderMonkey or JavaScriptCore host would still
+parse correctly, but file URLs in `INTERNAL_ERROR` messages land
+unscrubbed.
+
+## Quick start
+
+```js
+import { TextFormBuilder, ERR } from '@mmpworks/formbuilder-dsl';
+
+const schemaText = `
+columns: 10
+
+levels = ["Debug", "Info", "Warn"] -> {logLevel}
+
+[container({title})]
+  - [select(5,#levels,{logLevel})] Log level
+`;
+
+const result = new TextFormBuilder({ schemaText }).parse();
+
+if (result.error !== ERR.OK) {
+  console.error(result.messages.join('\n'));
+} else {
+  // result.payload is the AST. Pass it to your renderer.
+  console.log(JSON.stringify(result.payload, null, 2));
+}
+```
+
+To reuse one builder across two source strings, call
+`setSchemaText` instead of constructing a new builder each time:
+
+```js
+const builder = new TextFormBuilder({ schemaText: source1 });
+const r1 = builder.parse();
+
+builder.setSchemaText(source2);
+const r2 = builder.parse();
+```
 
 ## Loading the package
 

@@ -46,6 +46,22 @@ python tools/npm-headless-test.py --keep-alive       # leave the harness URL up 
 python tools/npm-headless-test.py --chrome "C:/path/to/chrome.exe"
 ```
 
+## screenshot-viewer.py
+
+Captures a PNG of the viewer with a chosen `.mmpform` sample preloaded.
+Spawns a local HTTP server rooted at the repo, encodes the sample as a
+share-hash URL (the same encoding the viewer's "Share" button produces),
+and launches headless Chrome with `--screenshot --virtual-time-budget`
+so promises and Vue/Vuetify mount complete before capture. Output lands
+at `docs/assets/screenshots/viewer-full-example.png` by default.
+
+```bash
+python tools/screenshot-viewer.py
+python tools/screenshot-viewer.py --sample simple-label.mmpform
+python tools/screenshot-viewer.py --output docs/assets/screenshots/custom.png
+python tools/screenshot-viewer.py --width 1920 --height 1080
+```
+
 ## npm-publish.py
 
 Publishes the staged bundle. Reads a granular access token from disk
