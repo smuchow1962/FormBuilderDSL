@@ -12,7 +12,8 @@
 #   coverage   — c8 with the thresholds declared in package.json. The
 #                README's "Tests + coverage" section names this as the
 #                gate that decides whether a build passes; this workflow
-#                runs it.
+#                runs it and uploads the resulting lcov report to
+#                Codecov so the README's coverage badge resolves.
 name: CI
 
 on:
@@ -71,5 +72,18 @@ jobs:
       - name: Install
         run: npm ci
 
-      - name: Coverage gate
-        run: npm run test:coverage:check
+      # One c8 invocation produces both the text + lcov reports and
+      # enforces the package.json:c8 thresholds. Running tests once
+      # keeps CI fast; the threshold gate is what decides pass/fail.
+      - name: Coverage (lcov + threshold gate)
+        run: npx c8 --reporter=text --reporter=lcov --check-coverage npm test
+
+      # Public-repo upload — no token required. fail_ci_if_error stays
+      # false so a Codecov outage or rate-limit doesn't sink an
+      # otherwise-green build; the gate above already protects the
+      # threshold contract.
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./coverage/lcov.info
+          fail_ci_if_error: false
