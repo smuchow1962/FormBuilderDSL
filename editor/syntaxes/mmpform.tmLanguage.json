@@ -1,0 +1,337 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "MMPForm DSL",
+  "scopeName": "source.mmpform",
+  "fileTypes": ["mmpform"],
+  "patterns": [
+    { "include": "#comments" },
+    { "include": "#row-markers" },
+    { "include": "#panel-marker" },
+    { "include": "#global-config" },
+    { "include": "#tooltips-decl" },
+    { "include": "#colors-decl" },
+    { "include": "#properties-decl" },
+    { "include": "#decorator-span" },
+    { "include": "#named-object-pk" },
+    { "include": "#option-source-decl" },
+    { "include": "#container-decl" },
+    { "include": "#control-decl" },
+    { "include": "#strings" },
+    { "include": "#binding" },
+    { "include": "#option-ref" },
+    { "include": "#dates" },
+    { "include": "#numbers" },
+    { "include": "#booleans-and-keywords" },
+    { "include": "#operators" },
+    { "include": "#label-escapes" },
+    { "include": "#punctuation" }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "match": "^\\s*(#).*$",
+          "name": "comment.line.number-sign.mmpform",
+          "captures": {
+            "1": { "name": "punctuation.definition.comment.mmpform" }
+          }
+        }
+      ]
+    },
+
+    "row-markers": {
+      "patterns": [
+        {
+          "match": "^\\s*(-)(?=\\s)",
+          "captures": {
+            "1": { "name": "keyword.control.row-start.mmpform" }
+          }
+        },
+        {
+          "match": "^\\s*(\\|)(?=\\s)",
+          "captures": {
+            "1": { "name": "keyword.control.row-continue.mmpform" }
+          }
+        }
+      ]
+    },
+
+    "panel-marker": {
+      "patterns": [
+        {
+          "match": "^\\s*(\\d+)(\\.)\\s+(.+)$",
+          "captures": {
+            "1": { "name": "constant.numeric.panel-number.mmpform" },
+            "2": { "name": "punctuation.separator.panel.mmpform" },
+            "3": { "name": "entity.name.section.panel-label.mmpform" }
+          }
+        }
+      ]
+    },
+
+    "global-config": {
+      "patterns": [
+        {
+          "match": "^\\s*(columns)\\s*(:)\\s*(\\d+)\\s*$",
+          "captures": {
+            "1": { "name": "keyword.declaration.columns.mmpform" },
+            "2": { "name": "punctuation.separator.key-value.mmpform" },
+            "3": { "name": "constant.numeric.integer.mmpform" }
+          }
+        }
+      ]
+    },
+
+    "tooltips-decl": {
+      "patterns": [
+        {
+          "match": "^\\s*(tooltips)\\s*(=)",
+          "captures": {
+            "1": { "name": "keyword.declaration.tooltips.mmpform" },
+            "2": { "name": "keyword.operator.assignment.mmpform" }
+          }
+        }
+      ]
+    },
+
+    "colors-decl": {
+      "patterns": [
+        {
+          "match": "^\\s*(colors)\\s*(=)",
+          "captures": {
+            "1": { "name": "keyword.declaration.colors.mmpform" },
+            "2": { "name": "keyword.operator.assignment.mmpform" }
+          }
+        }
+      ]
+    },
+
+    "properties-decl": {
+      "patterns": [
+        {
+          "match": "^\\s*(__properties)\\s*(=)",
+          "captures": {
+            "1": { "name": "keyword.declaration.properties.mmpform" },
+            "2": { "name": "keyword.operator.assignment.mmpform" }
+          }
+        }
+      ]
+    },
+
+    "decorator-span": {
+      "patterns": [
+        {
+          "name": "meta.decorator.mmpform",
+          "begin": "(?<!\\\\)`",
+          "end": "(?<!\\\\)`",
+          "patterns": [
+            { "match": "[biusr+\\-]",                           "name": "support.constant.style-code.mmpform" },
+            { "match": "bg",                                    "name": "support.constant.style-code.bg.mmpform" },
+            { "match": "#[0-9A-Fa-f]{3,6}",                     "name": "constant.numeric.color.hex.mmpform" },
+            { "match": ":[A-Za-z_][A-Za-z0-9_-]*",              "name": "variable.other.color-name.mmpform" }
+          ]
+        }
+      ]
+    },
+
+    "named-object-pk": {
+      "patterns": [
+        {
+          "comment": "!fieldName as the primary-key marker inside a named object literal: `name = { !key: ..., other: ... }`. The `!` here is a marker, not a logical-not operator.",
+          "match": "(?<=[{,]\\s)(!)([A-Za-z_][A-Za-z0-9_]*)\\s*(?=:)",
+          "captures": {
+            "1": { "name": "keyword.modifier.primary-key.mmpform" },
+            "2": { "name": "entity.name.tag.primary-key.mmpform" }
+          }
+        }
+      ]
+    },
+
+    "option-source-decl": {
+      "patterns": [
+        {
+          "match": "^\\s*([A-Za-z_][A-Za-z0-9_]*)\\s*(=)",
+          "captures": {
+            "1": { "name": "entity.name.function.option-source.mmpform" },
+            "2": { "name": "keyword.operator.assignment.mmpform" }
+          }
+        }
+      ]
+    },
+
+    "container-decl": {
+      "patterns": [
+        {
+          "comment": "[container ...], [repeater ...], [listManager ...], plus the `>` collapsible modifier.",
+          "match": "(\\[)(>)?(container|repeater|listManager)\\b",
+          "captures": {
+            "1": { "name": "punctuation.section.brackets.begin.mmpform" },
+            "2": { "name": "keyword.modifier.collapsible.mmpform" },
+            "3": { "name": "storage.type.container.mmpform" }
+          }
+        }
+      ]
+    },
+
+    "control-decl": {
+      "patterns": [
+        {
+          "match": "(\\[)(textfield|textarea|password|number|float|slider|check|toggle|select|combo|radio|multiselect|date|time|datetime|daterange|file|fileBrowser|fileSize|directoryBrowser|color|hidden|label|display)\\b",
+          "captures": {
+            "1": { "name": "punctuation.section.brackets.begin.mmpform" },
+            "2": { "name": "support.type.control.mmpform" }
+          }
+        }
+      ]
+    },
+
+    "strings": {
+      "patterns": [
+        {
+          "name": "string.quoted.double.mmpform",
+          "begin": "\"",
+          "end": "\"",
+          "patterns": [
+            { "match": "\\\\.", "name": "constant.character.escape.mmpform" }
+          ]
+        },
+        {
+          "name": "string.quoted.single.mmpform",
+          "begin": "'",
+          "end": "'",
+          "patterns": [
+            { "match": "\\\\.", "name": "constant.character.escape.mmpform" }
+          ]
+        }
+      ]
+    },
+
+    "binding": {
+      "patterns": [
+        {
+          "comment": "Function binding {@name} or {@registry.subFn}. Dotted forms resolve as a single key against the consumer's function registry (e.g. functions['math.add']).",
+          "match": "(\\{)(@)([A-Za-z_][A-Za-z0-9_]*(?:\\.[A-Za-z_][A-Za-z0-9_]*)*)(\\})",
+          "name": "entity.name.tag.binding.function.mmpform",
+          "captures": {
+            "1": { "name": "punctuation.section.binding.begin.mmpform" },
+            "2": { "name": "keyword.operator.function-marker.mmpform" },
+            "3": { "name": "entity.name.function.binding.mmpform" },
+            "4": { "name": "punctuation.section.binding.end.mmpform" }
+          }
+        },
+        {
+          "comment": "Inline-typed binding {name:int} on a simple single-segment binding.",
+          "match": "(\\{)([A-Za-z_][A-Za-z0-9_]*)(:)([A-Za-z_][A-Za-z0-9_]*)(\\})",
+          "name": "entity.name.tag.binding.typed.mmpform",
+          "captures": {
+            "1": { "name": "punctuation.section.binding.begin.mmpform" },
+            "2": { "name": "entity.name.tag.binding.mmpform" },
+            "3": { "name": "punctuation.separator.binding-type.mmpform" },
+            "4": { "name": "support.type.binding-data.mmpform" },
+            "5": { "name": "punctuation.section.binding.end.mmpform" }
+          }
+        },
+        {
+          "comment": "Repeater-scope `this.field` reference. The `this` segment is the current array item (rewritten to `arrayPath[].field` by infer-schema).",
+          "match": "(\\{)(this)(\\.)([A-Za-z_][A-Za-z0-9_]*(?:\\.[A-Za-z_][A-Za-z0-9_]*)*)(\\})",
+          "captures": {
+            "1": { "name": "punctuation.section.binding.begin.mmpform" },
+            "2": { "name": "variable.language.this.mmpform" },
+            "3": { "name": "punctuation.accessor.dot.mmpform" },
+            "4": { "name": "entity.name.tag.binding.mmpform" },
+            "5": { "name": "punctuation.section.binding.end.mmpform" }
+          }
+        },
+        {
+          "match": "\\{[A-Za-z_][A-Za-z0-9_.]*\\}",
+          "name": "entity.name.tag.binding.mmpform"
+        }
+      ]
+    },
+
+    "option-ref": {
+      "patterns": [
+        {
+          "match": "#[A-Za-z_][A-Za-z0-9_]*",
+          "name": "entity.name.function.option-source.mmpform"
+        }
+      ]
+    },
+
+    "dates": {
+      "patterns": [
+        {
+          "match": "\\b\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}(:\\d{2})?)?\\b",
+          "name": "constant.numeric.date.mmpform"
+        }
+      ]
+    },
+
+    "numbers": {
+      "patterns": [
+        {
+          "match": "(?<![A-Za-z_])-?\\d+\\.\\d+\\b",
+          "name": "constant.numeric.float.mmpform"
+        },
+        {
+          "match": "(?<![A-Za-z_])-?\\d+\\b",
+          "name": "constant.numeric.integer.mmpform"
+        }
+      ]
+    },
+
+    "booleans-and-keywords": {
+      "patterns": [
+        {
+          "comment": "The three bare-identifier keywords accepted in object / property values. Any other bare ident in value position is a parse error per the language's quoted-strings rule.",
+          "match": "\\b(true|false|null)\\b",
+          "name": "constant.language.mmpform"
+        },
+        {
+          "match": "\\b(in)\\b",
+          "name": "keyword.operator.in.mmpform"
+        },
+        {
+          "comment": "Universal `__common` params plus per-control / per-container parameter keys. Sources: control-spec.js (__common.params + per-type params) and parse-containers.js CONTAINER_PARAM_HANDLERS. The earlier inline `tooltip=` container parameter was removed in favour of `tt=`; only `tt` ships now.",
+          "match": "\\b(when|tt|init|compute|explain|__dataType|panels|search|filter|draggable|addLabel|commit|excluded|height|minHeight|maxHeight|min|max|step|decimals|rows|maxLength|minLength|placeholder|pattern|reveal|format|units|defaultUnit|accept|maxBytes|multiple|style)\\b",
+          "name": "variable.parameter.mmpform"
+        }
+      ]
+    },
+
+    "operators": {
+      "patterns": [
+        { "match": "->",            "name": "keyword.operator.binding.mmpform" },
+        { "match": "==|!=",         "name": "keyword.operator.comparison.mmpform" },
+        { "match": "&&|\\|\\|",     "name": "keyword.operator.logical.mmpform" },
+        {
+          "comment": "Bare `!` outside a named-object key position. The named-object PK marker (`{ !field: ... }`) is matched earlier by named-object-pk and consumed before this fires.",
+          "match": "!",
+          "name": "keyword.operator.logical.not.mmpform"
+        },
+        { "match": "=",             "name": "keyword.operator.assignment.parameter.mmpform" }
+      ]
+    },
+
+    "label-escapes": {
+      "patterns": [
+        {
+          "comment": "Escaped brackets in label / header text. `\\[` and `\\]` render as literal brackets without confusing the parser into a new declaration.",
+          "match": "\\\\[\\[\\]]",
+          "name": "constant.character.escape.bracket.mmpform"
+        }
+      ]
+    },
+
+    "punctuation": {
+      "patterns": [
+        { "match": "\\[",  "name": "punctuation.section.brackets.begin.mmpform" },
+        { "match": "\\]",  "name": "punctuation.section.brackets.end.mmpform" },
+        { "match": "\\(",  "name": "punctuation.section.parens.begin.mmpform" },
+        { "match": "\\)",  "name": "punctuation.section.parens.end.mmpform" },
+        { "match": ",",    "name": "punctuation.separator.comma.mmpform" },
+        { "match": ":",    "name": "punctuation.separator.colon.mmpform" }
+      ]
+    }
+  }
+}

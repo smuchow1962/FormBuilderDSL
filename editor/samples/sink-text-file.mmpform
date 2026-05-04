@@ -1,0 +1,48 @@
+# Full Example — exercises every documented feature.
+# Used as the editor-bundle preview file and as the parser smoke input.
+
+columns: 12
+  
+extChoices = ["log", "ndjson", "csv"] -> {logExtension}
+logTypes   = ["text", "ndjson", "csv"] -> {logOutputType} 
+levels     = {levelsList}
+rollingIntervalList = ["hourly", "daily", "custom"] -> {rollingInterval}
+shorthandDescription = `+b`Directory`` `i`(server path)``
+namingConventionInfo = "Rolled files are named: {templateName}-{pattern}.{ext}\nThe {pattern} is a .NET date format string. Common tokens: yyyy (year), MM (month), dd (day), HH (hour 00-23), mm (minute).\n\nExamples with templateName='game-server', extension='ndjson':\n  Daily:  game-server-20260413.ndjson\n  Hourly: game-server-2026041314.ndjson\n  Custom: game-server-20260413_1430.ndjson\n\nMid-period size rolls append an index: game-server-20260413.1.ndjson, game-server-20260413.2.ndjson."
+fileRollingIntro = "File rolling automatically creates new log files based on time intervals or file size limits. Old files are retained up to a configurable count and total size, then pruned automatically. Disable to write to a single file indefinitely — useful for short-lived processes, test runs, or systems that handle log rotation externally (e.g. logrotate)."
+rollingIntervalExplain = "Time-based trigger that creates a new log file when the interval elapses. 'hourly' rolls at the top of each hour. 'daily' rolls at midnight. 'custom' uses startMinute and captureDuration for game-server-style sessions (e.g. match-based logging). Works alongside max file size — whichever triggers first causes the roll."
+maxFileSizeExplain = "Size-based trigger that rolls the log file when it reaches this size. Accepts human-readable values: 10MB, 1GB, 500KB. Set to 0 for no size limit. When both time-based and size-based rolling are configured, whichever fires first wins. Size-rolled files get an index suffix (e.g. app-20260413.1.ndjson, app-20260413.2.ndjson)."
+namePatternExplain = "Uses .NET date format strings. Leave blank to use the default for the selected interval. See the naming card above for examples."
+
+tooltips = [
+    "tt-output"     = "Choose how each event is serialized — text (human-readable), ndjson (one JSON object per line), or csv (comma-separated, requires fixed schema).",
+    "tt-directory"  = "Folder where log files are written. Use an absolute path. The folder is created if missing.",
+    "tt-template"   = "Base name used for every log file. Combined with the rolling pattern and extension to produce file names.",
+    "tt-extension"  = "File extension appended to each log file. Match this to the output type so external tools recognize the format.",
+    "tt-rolling"    = "Master switch for file rolling. Off = single file forever. On = rotate by time and/or size.",
+    "tt-interval"   = "How often the log file is rolled by time. See the help panel below.",
+    "tt-maxsize"    = "Max bytes per file before a size-based roll. See the help panel below.",
+    "tt-pattern"    = "Date pattern injected into the file name. Blank = a sensible default for the chosen interval.",
+    "tt-retain"     = "How many rolled files to keep on disk before pruning the oldest.",
+    "tt-totalsize"  = "Hard cap on total bytes across all rolled files. Older files are pruned first when over budget.",
+    "tt-retain-days"= "Drop rolled files older than this many days, regardless of count or total-size limits."
+]
+
+[container("Text File", "Writes plain-text log files to disk")]
+
+  - [select(3,#logTypes,{logOutputType},tt="tt-output",init="text")] Log Output Type
+
+  - [textfield(6,{logDirectory},tt="tt-directory")] Logging Directory
+    | [textfield(3,{logFileTemplate},tt="tt-template",init="log-file")] File Name Template
+    | [combo(3,#extChoices,{logExtension},tt="tt-extension",init="log",compute={@extFromOutput})] Extension
+
+  - [label(12,#fileRollingIntro,style=note)]
+
+  - [>container] [toggle(3,{rollingLogsEnabled},tt="tt-rolling")] Rolling Log Configuration
+      - [label(12,#namingConventionInfo,style=note)]
+      - [select(3,#rollingIntervalList,{rollingInterval},tt="tt-interval",init="hourly",explain=#rollingIntervalExplain)] Rolling Interval
+        | [fileSize(3,{maxFileSize},tt="tt-maxsize",explain=#maxFileSizeExplain,init="10Mb")] Max File Size
+        | [textfield(6,{namePattern},tt="tt-pattern",explain=#namePatternExplain,init="yyyyMMdd")] Name pattern (blank = yyyyMMdd)
+      - [number(4,{maxRetainedFiles},tt="tt-retain",init="50")] Max Retained Files
+        | [fileSize(4,{totalSizeCap},tt="tt-totalsize",init="10Mb")] Total Size Cap
+        | [number(4,{retentionDays},tt="tt-retain-days",init="30")] Retention Days

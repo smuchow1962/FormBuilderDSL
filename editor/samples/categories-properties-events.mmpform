@@ -1,0 +1,131 @@
+columns: 12
+
+# ── Defaults from Herald.Core ───────────────────────────────────
+# Levels — Modules/Core/src/Levels/KnownLogLevels.cs
+# Cats   — Modules/Core/src/Events/LogCategory.cs
+# Props  — Modules/Core/src/Services/KnownPropertyNames.cs
+
+# Levels (the five LogLevelRegistry.CreateDefault registers)
+audit = { !name: "trace", fgAnsi: "gray" }
+trace = { !name: "trace", fgAnsi: "gray" }
+debug = { !name: "debug", fgAnsi: "cyan" }
+info  = { !name: "info",  fgAnsi: "white" }
+warn  = { !name: "warn",  fgAnsi: "yellow", bold }
+error = { !name: "error", fgAnsi: "white", bgAnsi: "red", bold }
+fatal = { !name: "error", fgAnsi: "white", bgAnsi: "red", bold }
+
+defaultLevels = [#trace, #debug, #info, #warn, #error] -> {levels}
+
+# Categories (LogCategory.App / Startup / Input / Camera / Board / Ui)
+catApp     = { !name: "App",     description: "Default application category" }
+catStartup = { !name: "Startup", description: "Bootstrap / startup phase" }
+catInput   = { !name: "Input",   description: "Input subsystem" }
+catCamera  = { !name: "Camera",  description: "Camera subsystem" }
+catBoard   = { !name: "Board",   description: "Board / world state" }
+catUi      = { !name: "Ui",      description: "UI events" }
+
+defaultCategories = [#catApp, #catStartup, #catInput, #catCamera, #catBoard, #catUi] -> {categories}
+
+# Properties (KnownPropertyNames — well-known template property names)
+# Identity
+propUserId      = { !name: "userId",      type: "string",   description: "User identifier" }
+propUserName    = { !name: "userName",    type: "string",   description: "User display name" }
+propEntityId    = { !name: "entityId",    type: "string",   description: "Entity identifier" }
+propEntityName  = { !name: "entityName",  type: "string",   description: "Entity display name" }
+# Actions and operations
+propAction      = { !name: "action",      type: "string",   description: "Action being performed" }
+propOperation   = { !name: "operation",   type: "string",   description: "Operation name" }
+propStatus      = { !name: "status",      type: "string",   description: "Status / outcome state" }
+propResult      = { !name: "result",      type: "string",   description: "Operation result" }
+# Values and changes
+propValue       = { !name: "value",       type: "number",   description: "Numeric value" }
+propDelta       = { !name: "delta",       type: "number",   description: "Change since last value" }
+propCount       = { !name: "count",       type: "number",   description: "Count / cardinality" }
+propAmount      = { !name: "amount",      type: "number",   description: "Amount / quantity" }
+propDuration    = { !name: "duration",    type: "number",   description: "Duration (ms)" }
+propElapsed     = { !name: "elapsed",     type: "number",   description: "Elapsed time (ms)" }
+# Location and context
+propPath        = { !name: "path",        type: "string",   description: "File / route path" }
+propSource      = { !name: "source",      type: "string",   description: "Source identifier" }
+propTarget      = { !name: "target",      type: "string",   description: "Target identifier" }
+propEndpoint    = { !name: "endpoint",    type: "string",   description: "Network endpoint" }
+# Error and diagnostic
+propError       = { !name: "error",       type: "string",   description: "Error message" }
+propReason      = { !name: "reason",      type: "string",   description: "Failure reason" }
+propException   = { !name: "exception",   type: "string",   description: "Exception type" }
+propStackTrace  = { !name: "stackTrace",  type: "string",   description: "Exception stack trace" }
+# Classification
+propCategory    = { !name: "category",    type: "string",   description: "Category tag" }
+propType        = { !name: "type",        type: "string",   description: "Type tag" }
+propKind        = { !name: "kind",        type: "string",   description: "Kind tag" }
+propTag         = { !name: "tag",         type: "string",   description: "Free-form tag" }
+# Timing
+propTimestamp   = { !name: "timestamp",   type: "datetime", description: "Event timestamp" }
+propTimeOfDay   = { !name: "timeOfDay",   type: "datetime", description: "Time of day" }
+
+defaultProperties = [
+  #propUserId, #propUserName, #propEntityId, #propEntityName,
+  #propAction, #propOperation, #propStatus, #propResult,
+  #propValue, #propDelta, #propCount, #propAmount, #propDuration, #propElapsed,
+  #propPath, #propSource, #propTarget, #propEndpoint,
+  #propError, #propReason, #propException, #propStackTrace,
+  #propCategory, #propType, #propKind, #propTag,
+  #propTimestamp, #propTimeOfDay
+] -> {properties}
+
+# ── Plain option sources ────────────────────────────────────────
+propType   = ["string", "number", "boolean", "datetime", "array", "object"] -> {propertyType}
+ansiColors = ["", "black", "red", "green", "yellow", "blue", "magenta", "cyan", "white", "gray"] -> {fgAnsi}
+
+# ── The form ────────────────────────────────────────────────────
+
+[container(panels=[1:4,2:4,3:4])]
+  1. Levels
+    - [listManager({levels},
+        minHeight="800px",
+        maxHeight="800px",
+        search=true,
+        filter="name",
+        addLabel="Add Level",
+        draggable=true,
+        commit={@commitLevels},
+        excluded=#defaultLevels
+      )]
+        - [textfield(12,{name},init="new level")] Name
+        - [select(3,#ansiColors,{fgAnsi})] FG ANSI
+          | [select(3,#ansiColors,{bgAnsi})] BG ANSI
+          | [color(3,{fg})] FG Custom
+          | [color(3,{bg})] BG Custom
+        - [check(3,{bold})] Bold
+          | [check(3,{italic})] Italic
+          | [check(3,{underline})] Underline
+          | [check(3,{strike})] Strikethrough
+
+  2. Properties
+      - [listManager({properties},
+          minHeight="800px",
+          maxHeight="800px",
+          search=true,
+          filter="name",
+          addLabel="Add Property",
+          commit={@commitProperties},
+          excluded=#defaultProperties
+        )]
+          - [textfield(12,{name},init="new property")] Name
+          - [select(12,#propType,{type},init="string")] Type
+          - [textfield(12,{description})] Description
+
+  3. Categories
+      - [listManager({categories},
+          minHeight="800px",
+          maxHeight="800px",
+          search=true,
+          filter="name",
+          addLabel="Add Category",
+          commit={@commitCategories},
+          excluded=#defaultCategories
+        )]
+          - [textfield(12,{name},init="new category")] Name
+          - [color(6,{fg},init="#61afef")] Foreground
+          - [color(6,{bg},init="#13151a")] Background
+          - [textfield(12,{description})] Description

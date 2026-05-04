@@ -1,0 +1,75 @@
+# Runs when this repository is used standalone (not via Herald submodule).
+#
+# Three jobs:
+#   test       — run the unit + smoke + properties suites across the
+#                Node versions the package supports (matrix: 18/20/22).
+#                The 18 floor matches `package.json:engines.node`. If
+#                any matrix entry fails, the build fails — which means
+#                a future use of a Node 19+ API gets caught at PR time.
+#   lint       — eslint over src/ + tests/. The repo's CODING_INSTRUCTIONS
+#                rule about named capture groups is enforced here too
+#                (any new regex without a named group fails the lint).
+#   coverage   — c8 with the thresholds declared in package.json. The
+#                README's "Tests + coverage" section names this as the
+#                gate that decides whether a build passes; this workflow
+#                runs it.
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: ['18', '20', '22']
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Test
+        run: npm test
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Coverage gate
+        run: npm run test:coverage:check

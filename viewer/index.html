@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>FormBuilder DSL — Viewer</title>
+
+<link rel="stylesheet" href="./viewer.css">
+
+<!-- Vue 3 + Vuetify 3 via CDN. Vuetify 4 component API matches; bump URLs when v4 is GA. -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vuetify@3/dist/vuetify.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css">
+<script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vuetify@3/dist/vuetify.min.js"></script>
+
+<!-- Ace editor (no-conflict build keeps `ace` namespaced). Same family
+     used by the Dashboard's bundled editor — pinned to the same major. -->
+<script src="https://cdn.jsdelivr.net/npm/ace-builds@1.43/src-min-noconflict/ace.js"></script>
+<!-- Ace mode for .mmpform — must load AFTER ace.js so its ace.define()
+     calls reach the editor's module loader. -->
+<script src="./mmpform-mode.js"></script>
+</head>
+<body>
+
+<header class="topbar">
+    <div class="brand">FormBuilder DSL</div>
+    <div class="toolbar">
+        <button id="btn-open"     title="Open .mmpform file (Ctrl+O)">Open</button>
+        <button id="btn-save"     title="Save .mmpform to disk (Ctrl+S)">Save</button>
+        <button id="btn-process"  class="primary" title="Parse + render (Ctrl+Enter)">Process</button>
+        <span class="sep"></span>
+        <label class="check"><input type="checkbox" id="opt-wrap"> Word wrap</label>
+        <label class="check" title="When on, every keystroke re-runs Process after a short pause. Off requires Ctrl+Enter to re-render."><input type="checkbox" id="opt-live-preview" checked> Live preview</label>
+        <label class="check" title="When on, Process rewrites the __properties block in place. Off lets you edit the block by hand without losing your edits."><input type="checkbox" id="opt-autosync-props" checked> Auto-sync __properties</label>
+        <button id="btn-share" title="Copy a shareable link to the current source">Share</button>
+        <span class="sep"></span>
+        <span id="filename" class="filename">(no file)</span>
+    </div>
+</header>
+
+<main id="root">
+
+    <section id="left" class="panel">
+        <div class="panel-title">
+            <span>Source <span class="muted">(.mmpform)</span></span>
+            <!-- Per-pane cursor readout. Updated by viewer.js on
+                 every Ace cursor change / focus event. Lives in the
+                 panel header (not the page footer) so the position
+                 reads as part of the editor it describes — easier to
+                 see at a glance and survives the user's eye-line
+                 staying inside the pane. -->
+            <span id="src-cursor-pos" class="pane-cursor-pos" title="Cursor position in this editor"></span>
+        </div>
+        <!-- Ace mounts on this div; the wrapper handles flex sizing
+             and the editor handles its own gutter, line numbers,
+             undo/redo, multi-line indent, and search. -->
+        <div id="src" class="editor-stack"></div>
+    </section>
+
+    <div id="splitter" class="splitter"></div>
+
+    <section id="right" class="panel">
+        <div class="tabs">
+            <button class="tab active" data-tab="preview">Render Preview</button>
+            <button class="tab"        data-tab="data">Live Data</button>
+            <button class="tab"        data-tab="schema">Object View</button>
+        </div>
+
+        <div class="tab-pane active" data-tab="preview">
+            <div class="pane-toolbar">
+                <label>Framework:
+                    <select id="fw-select">
+                        <option value="vuetify" selected>Vue 3 / Vuetify 3</option>
+                        <option value="ascii">ASCII (text preview)</option>
+                        <option value="html"   disabled>Plain HTML — coming</option>
+                    </select>
+                </label>
+                <label class="when-ascii">Width: <input type="number" id="preview-width" value="128" min="40" max="240" step="4"></label>
+                <label class="when-vue">Theme:
+                    <select id="vue-theme">
+                        <option value="dark" selected>Dark</option>
+                        <option value="light">Light</option>
+                    </select>
+                </label>
+                <span class="grow"></span>
+                <span id="form-edits-badge" class="when-vue form-edits-badge" title="Edits to the rendered form since the last Process pass"></span>
+                <button id="btn-form-undo" class="when-vue" title="Undo last form edit (Ctrl+Z while focus is in the rendered form)" disabled>↶ Undo</button>
+                <button id="btn-form-redo" class="when-vue" title="Redo last undone form edit (Ctrl+Y while focus is in the rendered form)" disabled>↷ Redo</button>
+                <button id="btn-form-reset" class="when-vue" title="Reset the rendered form to its post-Process state" disabled>Reset form</button>
+                <button id="btn-rerender" class="when-vue" title="Rebuild the Vue app with current AST">Re-render</button>
+            </div>
+            <!-- Preview-pane error banner. Sits between the framework
+                 toolbar and the rendered output so the operator sees
+                 the failure right where the rendered form would have
+                 been. Hidden when there is no error; populated by
+                 showPreviewError() on parse failure or Vue render
+                 failure. Visible regardless of which framework is
+                 selected — the error is the same in both modes. The
+                 banner only paints inside the Render Preview tab; the
+                 Live Data and Object View tabs keep their own surfaces
+                 (Live Data stays blank on parse error, Object View
+                 carries the diagnostics as comments). -->
+            <div id="preview-error" class="preview-error" role="alert" aria-live="polite" hidden>
+                <div class="preview-error-title" id="preview-error-title"></div>
+                <pre  class="preview-error-body"  id="preview-error-body"></pre>
+            </div>
+            <pre id="preview-ascii" class="output">(parse to render)</pre>
+            <div id="vue-mount"     class="vue-mount"></div>
+        </div>
+
+        <!-- Live Data — JSON of the form's reactive state, updates as
+             the user edits the rendered preview (other tab). -->
+        <div class="tab-pane" data-tab="data">
+            <div class="pane-toolbar">
+                <span class="muted">Live data — updates as you edit the rendered form.</span>
+                <span class="grow"></span>
+                <button id="btn-copy-data">Copy</button>
+            </div>
+            <div class="schema-stack">
+                <pre id="live-data" class="output">(parse to populate)</pre>
+            </div>
+        </div>
+
+        <div class="tab-pane" data-tab="schema">
+            <div class="pane-toolbar">
+                <label>Format:
+                    <select id="schema-format">
+                        <option value="class" selected>JS Class</option>
+                        <option value="object">JS Object literal</option>
+                        <option value="ts">TypeScript interfaces</option>
+                        <option value="raw">Raw schema (JSON)</option>
+                        <option value="vue-sfc">Vue SFC stub</option>
+                        <option value="react-jsx">React JSX stub</option>
+                        <option value="json-schema">JSON Schema (Draft 2020-12)</option>
+                    </select>
+                </label>
+                <label>Name: <input type="text" id="schema-name" value="FormData"></label>
+                <label class="check"><input type="checkbox" id="schema-fold-all"> Fold all</label>
+                <button id="btn-schema-unfold-all">Unfold all</button>
+                <button id="btn-copy">Copy</button>
+                <button id="btn-save-schema">Save…</button>
+                <span class="grow"></span>
+                <!-- Per-pane cursor readout for the Object View
+                     read-only editor. Same wiring as the Source
+                     pane's indicator; the JS picks the target
+                     element by editor identity (Source vs. Object
+                     View). -->
+                <span id="schema-cursor-pos" class="pane-cursor-pos" title="Cursor position in this editor"></span>
+            </div>
+            <!-- Object View is a read-only Ace editor. Ace gives us
+                 line numbers, syntax highlighting per mode, code
+                 folding (gutter chevrons collapse `{...}` and `[...]`
+                 chunks for JSON / JS / TS), and Ctrl+F search out of
+                 the box. The mode is swapped per the format selector
+                 above so each output renders with the right colours. -->
+            <div id="schema-editor" class="editor-stack"></div>
+        </div>
+    </section>
+
+</main>
+
+<footer class="status">
+    <span id="status" class="ok">Ready</span>
+    <span id="counts"></span>
+    <span id="cursor-pos" class="cursor-pos" title="Cursor position in the focused editor"></span>
+</footer>
+
+<!-- Toast — corner notification driven by setStatus(). The status-bar
+     line below the editor is easy to miss on a dense layout, so the
+     toast pops every status change for a few seconds. CSS-only,
+     no Vue/Vuetify dependency. -->
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script type="module" src="./viewer.js"></script>
+</body>
+</html>

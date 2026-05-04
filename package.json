@@ -1,0 +1,89 @@
+{
+  "name": "@mmpworks/formbuilder-dsl",
+  "version": "1.0.0",
+  "description": "A small DSL for declaring forms, used by Herald.Dashboard to render sink configuration UIs.",
+  "type": "module",
+  "main": "src/index.js",
+  "types": "./types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./types/index.d.ts",
+      "import": "./src/index.js"
+    },
+    "./expression": {
+      "types": "./types/expression.d.ts",
+      "import": "./src/expression.js"
+    },
+    "./interpolate": {
+      "types": "./types/interpolate.d.ts",
+      "import": "./src/interpolate.js"
+    },
+    "./text-fragment": {
+      "types": "./types/text-fragment.d.ts",
+      "import": "./src/text-fragment.js"
+    },
+    "./render-preview": {
+      "types": "./types/render-preview.d.ts",
+      "import": "./src/render-preview.js"
+    },
+    "./infer-schema": {
+      "types": "./types/infer-schema.d.ts",
+      "import": "./src/infer-schema.js"
+    },
+    "./property-collector": {
+      "types": "./types/property-collector.d.ts",
+      "import": "./src/property-collector.js"
+    }
+  },
+  "files": [
+    "src",
+    "types"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "pretest": "node scripts/sync-version.mjs",
+    "prepack": "node scripts/sync-version.mjs",
+    "test": "npm run test:unit && node tests/smoke.js && node tests/properties.js",
+    "lint": "eslint src tests",
+    "test:unit": "node --test tests/*.test.js",
+    "test:smoke": "node tests/smoke.js",
+    "test:properties": "node tests/properties.js",
+    "test:coverage": "c8 --reporter=text --reporter=lcov --reporter=html npm test",
+    "test:coverage:check": "c8 --reporter=text --check-coverage npm test"
+  },
+  "c8": {
+    "all": true,
+    "include": ["src/**/*.js"],
+    "exclude": [
+      "src/version-generated.js"
+    ],
+    "reports-dir": "coverage",
+    "lines": 85,
+    "branches": 75,
+    "functions": 85,
+    "statements": 85
+  },
+  "keywords": [
+    "form",
+    "dsl",
+    "schema",
+    "configuration"
+  ],
+  "author": "Steve Muchow",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/smuchow1962/FormBuilderDSL.git"
+  },
+  "bugs": {
+    "url": "https://github.com/smuchow1962/FormBuilderDSL/issues"
+  },
+  "homepage": "https://github.com/smuchow1962/FormBuilderDSL#readme",
+  "devDependencies": {
+    "@eslint/js": "^9.39.2",
+    "c8": "^11.0.0",
+    "eslint": "^9.39.2"
+  }
+}

@@ -1,0 +1,489 @@
+{
+  "__properties": null,
+  "colors": {},
+  "columns": 20,
+  "namedObjects": {},
+  "namedText": {},
+  "optionSources": {
+    "extChoices": {
+      "binding": "logExtension",
+      "bindings": [
+        "logExtension"
+      ],
+      "type": "static",
+      "values": [
+        "log",
+        "ndjson",
+        "csv"
+      ]
+    },
+    "levels": {
+      "binding": null,
+      "bindings": [],
+      "path": "levelsList",
+      "type": "dynamic"
+    },
+    "logTypes": {
+      "binding": "logOutputType",
+      "bindings": [
+        "logOutputType"
+      ],
+      "type": "static",
+      "values": [
+        "text",
+        "ndjson",
+        "csv"
+      ]
+    }
+  },
+  "root": {
+    "addLabel": null,
+    "arrayBinding": null,
+    "collapsible": false,
+    "commit": null,
+    "description": [
+      {
+        "kind": "binding",
+        "path": "shorthandDescription"
+      }
+    ],
+    "draggable": false,
+    "excludedRef": null,
+    "filter": null,
+    "headerControls": [],
+    "itemMax": null,
+    "itemMin": null,
+    "label": [],
+    "loc": {
+      "col": 2,
+      "length": 0,
+      "line": 7
+    },
+    "maxHeight": null,
+    "minHeight": null,
+    "nodeKind": "container",
+    "panels": null,
+    "rows": [
+      {
+        "controls": [
+          {
+            "binding": "logOutputType",
+            "bindingType": null,
+            "compute": null,
+            "contentRef": null,
+            "controlType": "select",
+            "dataType": null,
+            "explain": [],
+            "init": null,
+            "label": [
+              {
+                "kind": "text",
+                "text": "Log Output Type"
+              }
+            ],
+            "loc": {
+              "col": 6,
+              "length": 0,
+              "line": 9
+            },
+            "nodeKind": "control",
+            "optionsSource": "logTypes",
+            "params": {},
+            "readOnly": false,
+            "secret": false,
+            "tooltipRef": null,
+            "when": null,
+            "whenAst": null,
+            "width": 5
+          }
+        ],
+        "loc": {
+          "col": 1,
+          "length": 0,
+          "line": 9
+        },
+        "nodeKind": "row"
+      },
+      {
+        "controls": [
+          {
+            "binding": "logDirectory",
+            "bindingType": null,
+            "compute": null,
+            "contentRef": null,
+            "controlType": "textfield",
+            "dataType": null,
+            "explain": [],
+            "init": null,
+            "label": [
+              {
+                "kind": "text",
+                "text": "Logging Directory"
+              }
+            ],
+            "loc": {
+              "col": 6,
+              "length": 0,
+              "line": 11
+            },
+            "nodeKind": "control",
+            "optionsSource": null,
+            "params": {},
+            "readOnly": false,
+            "secret": false,
+            "tooltipRef": null,
+            "when": null,
+            "whenAst": null,
+            "width": 10
+          },
+          {
+            "binding": "logFileTemplate",
+            "bindingType": null,
+            "compute": null,
+            "contentRef": null,
+            "controlType": "textfield",
+            "dataType": null,
+            "explain": [],
+            "init": null,
+            "label": [
+              {
+                "kind": "text",
+                "text": "File Name Template"
+              }
+            ],
+            "loc": {
+              "col": 8,
+              "length": 0,
+              "line": 12
+            },
+            "nodeKind": "control",
+            "optionsSource": null,
+            "params": {},
+            "readOnly": false,
+            "secret": false,
+            "tooltipRef": null,
+            "when": null,
+            "whenAst": null,
+            "width": 6
+          },
+          {
+            "binding": "logExtension",
+            "bindingType": null,
+            "compute": null,
+            "contentRef": null,
+            "controlType": "combo",
+            "dataType": null,
+            "explain": [],
+            "init": null,
+            "label": [
+              {
+                "kind": "text",
+                "text": "Extension"
+              }
+            ],
+            "loc": {
+              "col": 8,
+              "length": 0,
+              "line": 13
+            },
+            "nodeKind": "control",
+            "optionsSource": "extChoices",
+            "params": {},
+            "readOnly": false,
+            "secret": false,
+            "tooltipRef": null,
+            "when": null,
+            "whenAst": null,
+            "width": 4
+          }
+        ],
+        "loc": {
+          "col": 1,
+          "length": 0,
+          "line": 11
+        },
+        "nodeKind": "row"
+      },
+      {
+        "controls": [
+          {
+            "addLabel": null,
+            "arrayBinding": null,
+            "collapsible": true,
+            "commit": null,
+            "description": [],
+            "draggable": false,
+            "excludedRef": null,
+            "filter": null,
+            "headerControls": [
+              {
+                "binding": "rollingLogsEnabled",
+                "bindingType": null,
+                "compute": null,
+                "contentRef": null,
+                "controlType": "toggle",
+                "dataType": null,
+                "explain": [],
+                "init": null,
+                "label": [],
+                "loc": {
+                  "col": 38,
+                  "length": 0,
+                  "line": 15
+                },
+                "nodeKind": "control",
+                "optionsSource": null,
+                "params": {},
+                "readOnly": false,
+                "secret": false,
+                "tooltipRef": null,
+                "when": null,
+                "whenAst": null,
+                "width": 3
+              }
+            ],
+            "itemMax": null,
+            "itemMin": null,
+            "label": [
+              {
+                "kind": "text",
+                "text": "Rolling Log Configuration"
+              }
+            ],
+            "loc": {
+              "col": 7,
+              "length": 0,
+              "line": 15
+            },
+            "maxHeight": null,
+            "minHeight": null,
+            "nodeKind": "container",
+            "panels": [
+              {
+                "label": [
+                  {
+                    "kind": "text",
+                    "text": "Panel One"
+                  }
+                ],
+                "number": 1,
+                "rows": [
+                  {
+                    "controls": [
+                      {
+                        "binding": "maxFileSize",
+                        "bindingType": null,
+                        "compute": null,
+                        "contentRef": null,
+                        "controlType": "number",
+                        "dataType": null,
+                        "explain": [],
+                        "init": null,
+                        "label": [
+                          {
+                            "kind": "text",
+                            "text": "Max File Size (bytes)"
+                          }
+                        ],
+                        "loc": {
+                          "col": 10,
+                          "length": 0,
+                          "line": 18
+                        },
+                        "nodeKind": "control",
+                        "optionsSource": null,
+                        "params": {
+                          "max": 1073741824,
+                          "min": 1,
+                          "step": 1024
+                        },
+                        "readOnly": false,
+                        "secret": false,
+                        "tooltipRef": null,
+                        "when": null,
+                        "whenAst": null,
+                        "width": 6
+                      }
+                    ],
+                    "loc": {
+                      "col": 1,
+                      "length": 0,
+                      "line": 18
+                    },
+                    "nodeKind": "row"
+                  },
+                  {
+                    "controls": [
+                      {
+                        "binding": "maxFileCount",
+                        "bindingType": null,
+                        "compute": null,
+                        "contentRef": null,
+                        "controlType": "number",
+                        "dataType": null,
+                        "explain": [],
+                        "init": null,
+                        "label": [
+                          {
+                            "kind": "text",
+                            "text": "Max File Count"
+                          }
+                        ],
+                        "loc": {
+                          "col": 10,
+                          "length": 0,
+                          "line": 19
+                        },
+                        "nodeKind": "control",
+                        "optionsSource": null,
+                        "params": {
+                          "max": 10000,
+                          "min": 1,
+                          "step": 1
+                        },
+                        "readOnly": false,
+                        "secret": false,
+                        "tooltipRef": null,
+                        "when": null,
+                        "whenAst": null,
+                        "width": 6
+                      }
+                    ],
+                    "loc": {
+                      "col": 1,
+                      "length": 0,
+                      "line": 19
+                    },
+                    "nodeKind": "row"
+                  }
+                ],
+                "width": 8
+              },
+              {
+                "label": [
+                  {
+                    "kind": "text",
+                    "text": "Panel Two"
+                  }
+                ],
+                "number": 2,
+                "rows": [
+                  {
+                    "controls": [
+                      {
+                        "binding": "logLevel",
+                        "bindingType": null,
+                        "compute": null,
+                        "contentRef": null,
+                        "controlType": "select",
+                        "dataType": null,
+                        "explain": [],
+                        "init": null,
+                        "label": [
+                          {
+                            "kind": "text",
+                            "text": "Log Level"
+                          }
+                        ],
+                        "loc": {
+                          "col": 10,
+                          "length": 0,
+                          "line": 22
+                        },
+                        "nodeKind": "control",
+                        "optionsSource": "levels",
+                        "params": {},
+                        "readOnly": false,
+                        "secret": false,
+                        "tooltipRef": null,
+                        "when": null,
+                        "whenAst": null,
+                        "width": 5
+                      }
+                    ],
+                    "loc": {
+                      "col": 1,
+                      "length": 0,
+                      "line": 22
+                    },
+                    "nodeKind": "row"
+                  },
+                  {
+                    "controls": [
+                      {
+                        "binding": "compressOldLogs",
+                        "bindingType": null,
+                        "compute": null,
+                        "contentRef": null,
+                        "controlType": "check",
+                        "dataType": null,
+                        "explain": [],
+                        "init": null,
+                        "label": [
+                          {
+                            "kind": "text",
+                            "text": "Compress Old Logs"
+                          }
+                        ],
+                        "loc": {
+                          "col": 10,
+                          "length": 0,
+                          "line": 23
+                        },
+                        "nodeKind": "control",
+                        "optionsSource": null,
+                        "params": {},
+                        "readOnly": false,
+                        "secret": false,
+                        "tooltipRef": null,
+                        "when": "rollingLogsEnabled",
+                        "whenAst": {
+                          "kind": "path",
+                          "path": [
+                            "rollingLogsEnabled"
+                          ]
+                        },
+                        "width": 3
+                      }
+                    ],
+                    "loc": {
+                      "col": 1,
+                      "length": 0,
+                      "line": 23
+                    },
+                    "nodeKind": "row"
+                  }
+                ],
+                "width": 12
+              }
+            ],
+            "rows": [],
+            "search": false,
+            "title": [],
+            "tooltipRef": null,
+            "when": null,
+            "whenAst": null
+          }
+        ],
+        "loc": {
+          "col": 1,
+          "length": 0,
+          "line": 15
+        },
+        "nodeKind": "row"
+      }
+    ],
+    "search": false,
+    "title": [
+      {
+        "kind": "binding",
+        "path": "title"
+      }
+    ],
+    "tooltipRef": null,
+    "when": null,
+    "whenAst": null
+  },
+  "tooltips": {},
+  "version": 1
+}

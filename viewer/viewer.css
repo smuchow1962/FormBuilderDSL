@@ -1,0 +1,565 @@
+/* FormBuilder DSL viewer — dark, compact, developer-tool aesthetic. */
+
+* { box-sizing: border-box; }
+
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background: #1b1d22;             /* dark editor bg */
+    color: #d4d6db;                  /* default fg */
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 13px;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+/* ---------- Top bar ---------- */
+
+.topbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 14px;
+    background: #13151a;
+    border-bottom: 1px solid #2a2d34;
+    flex-shrink: 0;
+}
+
+.brand {
+    font-weight: 600;
+    color: #ffd47a;                  /* warm accent */
+    letter-spacing: 0.4px;
+}
+
+.toolbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+}
+
+.toolbar button {
+    padding: 5px 12px;
+    background: #2a2d34;
+    color: #d4d6db;
+    border: 1px solid #3a3d44;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.toolbar button:hover { background: #3a3d44; }
+.toolbar button.primary {
+    background: #2e6cd1;
+    border-color: #4185e8;
+    color: white;
+}
+.toolbar button.primary:hover { background: #4185e8; }
+
+.toolbar .sep { width: 1px; height: 18px; background: #3a3d44; margin: 0 4px; }
+
+.check { display: inline-flex; align-items: center; gap: 6px; }
+
+.filename {
+    font-family: 'Consolas', 'Monaco', monospace;
+    color: #8a8d94;
+    margin-left: auto;
+    font-size: 12px;
+}
+
+/* ---------- Main split ---------- */
+
+#root {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+    min-height: 0;
+}
+
+.panel {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-width: 200px;
+    min-height: 0;
+}
+
+#left  { flex-basis: 50%; flex-grow: 0; flex-shrink: 0; }
+#right { flex: 1; }
+
+.panel-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 6px 12px;
+    background: #1f2228;
+    border-bottom: 1px solid #2a2d34;
+    color: #c4c6cb;
+    font-size: 12px;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+/* Per-pane cursor readout. Lives inside a panel header (Source) or
+   pane toolbar (Object View) so the position visibly belongs to the
+   editor it describes. Monospace so the digit columns don't dance as
+   the caret moves. Empty until the editor gains focus the first
+   time, after which it updates on every cursor change. */
+.pane-cursor-pos {
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 11.5px;
+    font-weight: 400;
+    color: #8a8d94;                       /* matches the muted status-bar text */
+    letter-spacing: 0.2px;
+}
+
+.muted { color: #6e7178; font-weight: 400; }
+
+.splitter {
+    width: 6px;
+    background: #2a2d34;
+    cursor: col-resize;
+    flex-shrink: 0;
+}
+.splitter:hover { background: #3e6cd1; }
+
+/* ---------- Editor stack (Ace mount) ----------
+   The whole left pane is now a single Ace editor. Ace renders its own
+   gutter, line numbers, and highlight layer; the wrapper just gives it
+   a flex-sized container with overflow control so it sits inside the
+   panel cleanly. The .wrap rule is intentionally a no-op now — wrap
+   mode is toggled at the editor level via session.setUseWrapMode(). */
+
+.editor-stack {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    min-height: 0;
+}
+
+/* ---------- Token colors (TextMate-ish scope mapping) ---------- */
+
+.tk-comment    { color: #6a7280; font-style: italic; }
+.tk-string     { color: #98c379; }
+.tk-binding    { color: #e5c07b; font-weight: 600; }   /* matches editor bundle's bindings */
+.tk-optref     { color: #d19a66; }                     /* matches option-source name */
+.tk-decorator  { color: #56b6c2; }                     /* backtick spans */
+.tk-date       { color: #c678dd; }
+.tk-number     { color: #c678dd; }
+.tk-bool       { color: #56b6c2; }
+.tk-keyword    { color: #c678dd; }                     /* in / when / panels / param keys */
+.tk-decl       { color: #ffd47a; font-weight: 600; }   /* columns / container / repeater / tooltips / colors */
+.tk-ctype      { color: #61afef; }                     /* control type names */
+.tk-op         { color: #abb2bf; }
+
+/* ---------- Ace token overrides for .mmpform ----------
+   Maps the scope names emitted by mmpform-mode.js to the same palette
+   the legacy highlighter.js used. Ace turns dotted scope names into
+   compound class names (`keyword.control` → `ace_keyword ace_control`),
+   which is why the rules below combine class selectors. Targeting
+   `.ace_editor` instead of a theme-specific prefix means the colours
+   carry over if the theme is ever swapped. */
+
+.ace_editor .ace_comment           { color: #6a7280; font-style: italic; }
+.ace_editor .ace_string            { color: #98c379; }
+.ace_editor .ace_string.ace_quoted { color: #98c379; }
+.ace_editor .ace_markup.ace_bold   { color: #56b6c2; }   /* backtick spans */
+.ace_editor .ace_variable.ace_parameter { color: #e5c07b; font-weight: 600; }   /* {bindings} */
+.ace_editor .ace_entity.ace_name.ace_tag { color: #d19a66; }                    /* #optionRefs */
+.ace_editor .ace_constant.ace_numeric    { color: #c678dd; }                    /* numbers + dates */
+.ace_editor .ace_constant.ace_language   { color: #56b6c2; }                    /* true / false */
+.ace_editor .ace_keyword                 { color: #c678dd; }                    /* in / when / init / etc. */
+.ace_editor .ace_keyword.ace_control     { color: #ffd47a; font-weight: 600; }  /* columns / container / etc. */
+.ace_editor .ace_keyword.ace_operator    { color: #abb2bf; }                    /* -> == != = */
+.ace_editor .ace_support.ace_type        { color: #61afef; }                    /* control types */
+.ace_editor .ace_paren                   { color: #abb2bf; }                    /* [ ] ( ) { } */
+.ace_editor .ace_punctuation             { color: #abb2bf; }                    /* : , - | */
+.ace_editor .ace_punctuation.ace_operator { color: #abb2bf; }
+
+/* ---------- Right pane (tabs) ---------- */
+
+.tabs {
+    display: flex;
+    background: #1f2228;
+    border-bottom: 1px solid #2a2d34;
+    flex-shrink: 0;
+}
+
+.tab {
+    background: transparent;
+    color: #8a8d94;
+    border: 0;
+    padding: 8px 16px;
+    cursor: pointer;
+    font-size: 12px;
+    border-right: 1px solid #2a2d34;
+}
+.tab:hover  { color: #d4d6db; }
+.tab.active { color: #ffd47a; box-shadow: inset 0 -2px 0 #ffd47a; }
+
+.tab-pane {
+    flex: 1;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
+}
+.tab-pane.active { display: flex; }
+
+.pane-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 12px;
+    background: #1f2228;
+    border-bottom: 1px solid #2a2d34;
+    font-size: 12px;
+    flex-shrink: 0;
+}
+
+.pane-toolbar select,
+.pane-toolbar input[type="text"],
+.pane-toolbar input[type="number"] {
+    background: #13151a;
+    color: #d4d6db;
+    border: 1px solid #3a3d44;
+    border-radius: 3px;
+    padding: 3px 6px;
+    font-size: 12px;
+}
+.pane-toolbar input[type="number"] { width: 64px; }
+
+.pane-toolbar button {
+    padding: 4px 10px;
+    background: #2a2d34;
+    color: #d4d6db;
+    border: 1px solid #3a3d44;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+}
+.pane-toolbar button:hover { background: #3a3d44; }
+
+.output {
+    flex: 1;
+    margin: 0;
+    padding: 12px 14px;
+    background: #1b1d22;
+    color: #d4d6db;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 12.5px;
+    line-height: 1.55;
+    overflow: auto;
+    white-space: pre;
+}
+
+/* Object View mounts a read-only Ace editor whose mode switches
+   per format selector. Ace handles its own gutter, line numbers,
+   fold widgets, and syntax highlighting; the #schema-editor div
+   uses .editor-stack for flex sizing and otherwise inherits Ace's
+   visual surface. */
+
+/* Optional sinks-bridge UI. Painted only when the `?show=1` URL
+   flag is present (viewer.js sets `body.show-private` at boot).
+   Without the class, every selector below is unmatched and the
+   private buttons / chips / dialog stay invisible. The HTML for
+   these elements is also hidden via the same class in index.html
+   so a curious viewer of the page DOM doesn't see hidden topbar
+   buttons either. */
+body.show-private button.private-feature {
+    background: #6b46c1 !important;
+    color: white !important;
+    border-color: #7c5fd1 !important;
+}
+body.show-private button.private-feature:hover { background: #7c5fd1 !important; }
+body.show-private button.private-feature::before { content: '🔒 '; opacity: 0.8; }
+
+/* Currently-edited sink chip on the topbar. */
+body.show-private .current-sink-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    background: rgba(107, 70, 193, 0.18);   /* #6B46C1 purple, 18% */
+    color: #c8b3ff;                         /* #C8B3FF light purple */
+    border: 1px solid rgba(124, 95, 209, 0.5); /* #7C5FD1 purple, 50% */
+    border-radius: 12px;
+    font-size: 11px;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-weight: 500;
+}
+
+/* Sinks picker dialog (Vue/Vuetify mounted into #sinks-dialog-mount). */
+body.show-private .sink-picker-card        { padding: 0; }
+body.show-private .sink-picker-search      { margin-bottom: 12px; }
+body.show-private .sink-picker-list        { background: transparent; }
+body.show-private .sink-picker-empty       { padding: 20px; text-align: center; opacity: 0.6; font-size: 13px; }
+
+/* Hide every private-feature button when the flag is off. The HTML
+   carries the class from the start; the bridge doesn't need to
+   create or destroy nodes, just opt-in to visibility. */
+body:not(.show-private) .private-feature,
+body:not(.show-private) .current-sink-chip {
+    display: none !important;
+}
+
+/* ---------- Vue / Vuetify mount ---------- */
+
+.vue-mount {
+    flex: 1;
+    overflow: auto;
+    background: transparent;
+}
+
+/* Form preview niceties — fb-form-page uses Vuetify theme variables so the
+   background tracks Dark/Light alongside the v-card itself. */
+.fb-form-page         {
+    padding: 20px;
+    min-height: 100%;
+    box-sizing: border-box;
+    background: rgb(var(--v-theme-background));
+    color: rgb(var(--v-theme-on-background));
+}
+.fb-form-card         { width: 100%; }
+.fb-form-card-body    { padding: 20px 24px; }
+/* Grid-based 50/50: 1fr 1fr forces equal halves regardless of Vuetify's
+   intrinsic input widths. min-width:0 on both halves stops them from
+   stretching past their column. */
+.fb-filesize-row      { display: grid; grid-template-columns: 1fr 1fr; gap: 0; align-items: start; }
+.fb-filesize-amount,
+.fb-filesize-unit     { min-width: 0; }
+.fb-filesize-amount   .v-input__control,
+.fb-filesize-unit     .v-input__control { min-width: 0; }
+.fb-root-header h2.fb-title { margin: 0 0 4px 0; font-size: 1.3rem; }
+.fb-root-header p.fb-desc   { margin: 0 0 12px 0; opacity: 0.8; }
+.fb-root-header p.fb-tip    { margin: 0 0 12px 0; font-size: 0.85rem; opacity: 0.7; }
+.fb-rows              { display: flex; flex-direction: column; gap: 0; }
+.fb-subcontainer      { margin: 8px 0; }
+.fb-header-ctl        { margin-left: 12px; }
+.fb-tooltip-host      { display: contents; }
+.fb-daterange         { display: flex; gap: 12px; }
+.fb-label.fb-label-heading { font-size: 1.1rem; font-weight: 600; margin: 8px 0 4px 0; }
+.fb-label.fb-label-help    { display: block; opacity: 0.7; }
+.fb-label.fb-label-note    { white-space: pre-line; line-height: 1.5; opacity: 0.85; }
+.fb-divider                { margin: 12px 0; }
+
+/* Consistent control stack: control (Vuetify renders its own label
+   via the label prop), then optional explain block. */
+.fb-control-stack          { display: flex; flex-direction: column; gap: 2px; padding: 2px 0; }
+.fb-row                    { margin-top: 0 !important; margin-bottom: 0 !important; }
+
+/* Compound-control fieldset. Strips the default browser fieldset
+   border and inset so the group reads as one card without a heavy
+   second outline around the Vuetify inputs. <legend> is positioned
+   like the field label above its row. */
+.fb-fieldset {
+    border: 0;
+    margin: 0;
+    padding: 0;
+    min-inline-size: auto;           /* override the default min-width: -moz-min-content */
+}
+.fb-legend {
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+    opacity: 0.85;
+    line-height: 1.3;
+    padding: 0 0 2px 0;
+    color: rgb(var(--v-theme-on-surface));
+}
+
+/* Swimlanes — horizontal panel layout when panels=[1:N,2:N,...] sums to
+   <= totalCols. Vuetify's VRow/VCol drives the grid; the wrapper styles
+   below give each lane the bordered-card chrome the accordion variant
+   uses for its expanded body. */
+.fb-swimlanes              { margin-top: 0 !important; margin-bottom: 0 !important; }
+.fb-swimlane-card          { height: 100%; }
+.fb-swimlane-title         { font-size: 0.95em; padding: 8px 12px !important; }
+.fb-swimlane-body          { padding: 8px 12px !important; }
+
+/* Toast — fixed-position corner pop driven by setStatus(). Three
+   colour stripes match the kinds setStatus uses (ok / warn / err).
+   transform + opacity drive the show/hide animation; pointer-events
+   stays off so the toast never swallows clicks meant for the editor
+   underneath. */
+
+.toast {
+    position: fixed;
+    right: 20px;
+    bottom: 40px;
+    padding: 10px 16px;
+    min-width: 220px;
+    max-width: 400px;
+    background: #2a2d34;
+    color: #d4d6db;
+    border-left: 3px solid #56b6c2;
+    border-radius: 4px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+    font-size: 13px;
+    line-height: 1.4;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.18s ease, transform 0.18s ease;
+    pointer-events: none;
+    z-index: 10000;
+}
+.toast.show       { opacity: 1; transform: translateY(0); }
+.toast.toast-ok   { border-left-color: #56b6c2; }
+.toast.toast-warn { border-left-color: #ffd47a; }
+.toast.toast-err  { border-left-color: #e06c75; }
+
+/* List manager — scrollable + drag-reorderable list with toolbar. */
+.fb-listmanager            { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.fb-lm-toolbar             { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.fb-lm-search              { flex: 1; min-width: 140px; }
+.fb-lm-add                 { flex-shrink: 0; }
+.fb-lm-commit              { flex-shrink: 0; }
+.fb-lm-list                { display: flex; flex-direction: column; gap: 4px; overflow-y: auto; padding: 4px; border: 1px solid #2a2d34; border-radius: 4px; background: #1f2228; min-height: 80px; }
+.fb-lm-empty               { padding: 16px; color: #6b7280; font-size: 0.9em; text-align: center; font-style: italic; }
+.fb-lm-row                 { display: flex; align-items: center; gap: 8px; padding: 6px 8px; background: #13151a; border-radius: 4px; transition: background 0.1s; }
+.fb-lm-row:hover           { background: #1c1f25; }
+.fb-lm-row-locked          { opacity: 0.85; }
+.fb-lm-handle              { color: #6b7280; font-size: 14px; user-select: none; flex-shrink: 0; line-height: 1; padding: 0 4px; cursor: grab; }
+.fb-lm-handle:hover        { color: #d4d6db; }
+.fb-lm-handle:active       { cursor: grabbing; }
+.fb-lm-dialog-title        { display: flex !important; align-items: center; gap: 12px; }
+.fb-lm-dialog-title-text   { font-size: 1em; opacity: 0.85; }
+.fb-lm-chip                { flex: 1; padding: 3px 10px; border-radius: 12px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.92em; background: rgba(255,255,255,0.04); color: #e5e7eb; }
+.fb-lm-locked              { padding: 0 6px; opacity: 0.65; font-size: 0.95em; flex-shrink: 0; }
+.fb-lm-edit, .fb-lm-delete { flex-shrink: 0; }
+
+.fb-explain                { font-size: 0.85em; opacity: 0.85; margin-top: 2px; }
+.fb-explain-summary        { cursor: pointer; user-select: none; padding: 4px 0; color: #61afef; }
+.fb-explain-summary:hover  { color: #82c0ff; }
+.fb-explain-body           { padding: 8px 12px; background: rgba(255,255,255,0.04); border-left: 2px solid #61afef; white-space: pre-line; line-height: 1.5; margin-top: 4px; }
+
+.fb-dir-row                { display: flex; gap: 8px; align-items: flex-start; }
+.fb-dir-row .fb-dir-field  { flex: 1; }
+
+/* Colour compound — checker-pattern null swatch on the left, native
+   picker on the right. The swatch carries the universal "no fill"
+   visual; its active state (blue ring) tells the operator which input
+   is currently authoritative. CSS-only, no JS state. */
+.fb-color-row              { display: flex; gap: 4px; align-items: center; }
+.fb-color-row .fb-color-input  { flex: 1; min-width: 0; }
+
+.fb-color-null {
+    width: 32px;
+    height: 32px;
+    border: 1px solid #2a2d34;
+    border-radius: 4px;
+    cursor: pointer;
+    flex-shrink: 0;
+    padding: 0;
+    background-color: #ffffff;
+    background-image:
+        linear-gradient( 45deg, #888 25%, transparent 25%),
+        linear-gradient(-45deg, #888 25%, transparent 25%),
+        linear-gradient( 45deg, transparent 75%, #888 75%),
+        linear-gradient(-45deg, transparent 75%, #888 75%);
+    background-size: 8px 8px;
+    background-position: 0 0, 0 4px, 4px -4px, -4px 0;
+    transition: border-color 0.12s, box-shadow 0.12s;
+}
+.fb-color-null:hover         { border-color: #61afef; }
+.fb-color-null-active        { border-color: #61afef; box-shadow: 0 0 0 1px #61afef; }
+
+.grow                 { flex: 1; }
+
+/* Edits-since-Process badge — sits next to the Undo/Redo buttons in
+   the preview pane toolbar so the operator sees how many history
+   steps live between the rendered form and the parsed AST. Hidden
+   when the count is zero (controlled by the toggle of `.show`). */
+.form-edits-badge {
+    display: none;
+    padding: 2px 8px;
+    background: rgba(255, 212, 122, 0.12);   /* #FFD47A amber, 12% */
+    color: #ffd47a;                          /* #FFD47A amber */
+    border: 1px solid rgba(255, 212, 122, 0.4); /* #FFD47A amber, 40% */
+    border-radius: 10px;
+    font-size: 11px;
+    font-family: 'Consolas', 'Monaco', monospace;
+}
+.form-edits-badge.show { display: inline-block; }
+
+/* ---------- Status ---------- */
+
+.status {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 14px;
+    background: #13151a;
+    border-top: 1px solid #2a2d34;
+    font-size: 11px;
+    color: #8a8d94;
+    flex-shrink: 0;
+}
+
+.status .ok    { color: #98c379; }
+.status .warn  { color: #ffd47a; }
+.status .err   { color: #e06c75; }
+
+/* Live cursor-position indicator. Lives at the right edge of the
+   status footer; stays empty until either editor gets focus.
+   Monospace font so the digit columns don't dance. */
+.cursor-pos {
+    margin-left: 16px;
+    font-family: 'Consolas', 'Monaco', monospace;
+    color: #8a8d94;                       /* matches the status-bar text */
+}
+
+/* Preview-pane error banner. Sits between the pane toolbar and the
+   rendered output so a parse failure (or a Vue render failure) reads
+   right where the form would have been. Hidden by default; the [hidden]
+   attribute toggles visibility via showPreviewError / hidePreviewError.
+   The banner spans the preview pane width; flex-shrink:0 keeps the
+   block at its natural height and lets the body <pre> scroll inside
+   itself when the diagnostics list is long. */
+.preview-error {
+    flex-shrink: 0;
+    margin: 8px 12px;
+    padding: 10px 12px;
+    background: rgba(224, 108, 117, 0.12);   /* #E06C75 red, 12% */
+    border: 1px solid rgba(224, 108, 117, 0.45); /* #E06C75 red, 45% */
+    border-left: 3px solid #e06c75;          /* #E06C75 red — solid stripe */
+    border-radius: 4px;
+    color: #f4c5ca;                          /* #F4C5CA pale red — readable on the dark bg */
+    font-size: 12.5px;
+    line-height: 1.45;
+    max-height: 30vh;
+    overflow: auto;
+}
+
+.preview-error-title {
+    font-weight: 600;
+    color: #e06c75;                          /* #E06C75 red — title leads */
+    margin-bottom: 6px;
+    font-size: 13px;
+}
+
+.preview-error-body {
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    color: inherit;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 12.5px;
+    white-space: pre-wrap;                   /* wrap long messages so the banner doesn't get a horizontal scrollbar */
+    word-break: break-word;
+}
+
+/* Parse-error row marker. Highlights the line in the source editor
+   where a ParseError reported its location. The marker class lives
+   on the Ace marker layer, which sits behind the text, so reading
+   the row stays clear. The colour is a low-saturation red overlay
+   to read as "something here" without screaming. */
+.ace_marker-layer .fb-parse-error-row {
+    position: absolute;
+    background: rgba(224, 108, 117, 0.18);   /* #E06C75 red, 18% — matches .status .err */
+    border-left: 2px solid rgba(224, 108, 117, 0.65); /* #E06C75 red, 65% */
+    z-index: 4;
+}

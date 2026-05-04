@@ -1,0 +1,23 @@
+columns: 20
+
+extChoices = ["log", "ndjson", "csv"] -> {logExtension}
+logTypes   = ["text", "ndjson", "csv"] -> {logOutputType}
+levels     = {levelsList}
+
+[container({title},{shorthandDescription})]
+
+  - [select(5,#logTypes,{logOutputType})] Log Output Type
+
+  - [textfield(10,{logDirectory})] Logging Directory
+    | [textfield(6,{logFileTemplate})] File Name Template
+    | [combo(4,#extChoices,{logExtension})] Extension
+
+  - [>container(panels=[1:8,2:12])] [toggle(3,{rollingLogsEnabled})] Rolling Log Configuration
+
+    1. Panel One
+      - [number(6,{maxFileSize},min=1,max=1073741824,step=1024)] Max File Size (bytes)
+      - [number(6,{maxFileCount},min=1,max=10000,step=1)] Max File Count
+
+    2. Panel Two
+      - [select(5,#levels,{logLevel})] Log Level
+      - [check(3,{compressOldLogs},when="rollingLogsEnabled")] Compress Old Logs

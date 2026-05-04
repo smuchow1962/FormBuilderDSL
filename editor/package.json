@@ -1,0 +1,30 @@
+{
+  "name": "mmpform-language",
+  "displayName": "MMPForm DSL",
+  "description": "Syntax highlighting for FormBuilderDSL .mmpform files.",
+  "version": "1.0.0",
+  "publisher": "smuchow1962",
+  "engines": {
+    "vscode": "^1.60.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "mmpform",
+        "aliases": ["MMPForm", "mmpform"],
+        "extensions": [".mmpform"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "mmpform",
+        "scopeName": "source.mmpform",
+        "path": "./syntaxes/mmpform.tmLanguage.json"
+      }
+    ]
+  }
+}
