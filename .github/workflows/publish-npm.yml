@@ -1,0 +1,83 @@
+# Publishes @mmpworks/formbuilder-dsl to npm via trusted publishing
+# (OIDC). No NPM_TOKEN secret on disk — the workflow's short-lived
+# OIDC token is what npm verifies against the trusted-publisher
+# config on the package settings page (organization smuchow1962,
+# repo FormBuilderDSL, workflow filename publish-npm.yml,
+# environment MMPWorks). The repo's GitHub Settings -> Environments
+# page must define an environment named MMPWorks for the OIDC claim
+# to match what npm expects.
+#
+# Triggers:
+#   release: [published] — cut a GitHub release; tag + notes + publish
+#                          land in one click. The release tag (vX.Y.Z)
+#                          must match package.json:version exactly.
+#   workflow_dispatch    — manual button in the Actions tab. Useful for
+#                          first-run verification or republishing.
+
+name: Publish to npm
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: MMPWorks
+    permissions:
+      contents: read
+      id-token: write   # required so npm can verify the OIDC token
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          registry-url: 'https://registry.npmjs.org'
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # The package version on disk has to match the release tag, or
+      # somebody mistyped a tag and we'd ship a stale version under a
+      # new label. Skipped on workflow_dispatch — manual runs publish
+      # whatever's in package.json by design.
+      - name: Verify version matches release tag
+        if: github.event_name == 'release'
+        run: |
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          TAG_NAME="${GITHUB_REF#refs/tags/}"
+          TAG_VERSION="${TAG_NAME#v}"
+          if [ "$PKG_VERSION" != "$TAG_VERSION" ]; then
+            echo "ERROR: package.json version ($PKG_VERSION) does not match release tag ($TAG_NAME)"
+            exit 1
+          fi
+          echo "Version match: $PKG_VERSION"
+
+      - name: Install
+        run: npm ci
+
+      # Same gates 'npm test' runs locally — unit + smoke + properties.
+      # If these fail, no publish.
+      - name: Test
+        run: npm test
+
+      # Reuses the existing tooling: stage-npm assembles npm-bundle/,
+      # npm-test.py runs npm pack + install-in-tempdir to confirm the
+      # bundle is install-clean before we ship it.
+      - name: Stage bundle
+        run: python tools/stage-npm.py
+
+      - name: Smoke test staged bundle
+        run: python tools/npm-test.py
+
+      # --provenance attaches a build attestation; the OIDC token from
+      # the id-token: write permission is what npm exchanges with the
+      # trusted-publisher config to authorize the publish. No
+      # NODE_AUTH_TOKEN, no .npmrc on disk.
+      - name: Publish
+        working-directory: npm-bundle
+        run: npm publish --access public --provenance
