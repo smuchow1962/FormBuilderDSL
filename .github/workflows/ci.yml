@@ -78,13 +78,12 @@ jobs:
       - name: Coverage gate
         run: npm run test:coverage:check
 
-      # Codecov repository upload token, supplied via the CODECOV_TOKEN
-      # repo secret. fail_ci_if_error stays false so a Codecov outage or
+      # Public-repo upload — Codecov's tokenless path processes the
+      # report. fail_ci_if_error stays false so a Codecov outage or
       # rate-limit doesn't sink an otherwise-green build; the gate above
       # already protects the threshold contract.
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
           files: ./coverage/lcov.info
-          token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: false
