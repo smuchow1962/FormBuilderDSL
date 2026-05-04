@@ -1,6 +1,6 @@
 {
   "name": "@mmpworks/formbuilder-dsl",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A small DSL for declaring forms, used by Herald.Dashboard to render sink configuration UIs.",
   "type": "module",
   "main": "src/index.js",
