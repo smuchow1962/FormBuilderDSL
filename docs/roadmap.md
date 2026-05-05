@@ -1,5 +1,8 @@
 # Roadmap
 
+## when looking at Herald features... {thisProjectDir}/../Modules has all the ecosystem available to research - e:\dev\Herald is the master of all the subprojects
+## also E:\dev\herald-website and E:\dev\Herald.Py provide more info
+
 Forward-looking notes about possible additions to the package and the viewer. Items here are not commitments — they are sketched ideas that the principal-engineer reviews flagged as worth considering. Each item names what it would add, what it would cost, and what open questions still need to be settled.
 
 A reader looking for the contract today should read [`architecture.md`](architecture.md), [`expression-trust.md`](expression-trust.md), and the README. This file is for future-direction discussion only.

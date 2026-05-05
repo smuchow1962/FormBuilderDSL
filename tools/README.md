@@ -1,7 +1,8 @@
 # tools/
 
-Python helpers for staging + publishing the FormBuilderDSL JS package
-to npm under the `@mmpworks` (or any other) organization scope.
+Helpers for FormBuilderDSL maintainers. The publish pipeline (stage,
+test, publish) is Python; the manifest-folder smoke check is a Node
+ESM tool because it exercises the parser's public JS API directly.
 
 ## stage-npm.py
 
@@ -78,6 +79,24 @@ python tools/npm-publish.py --dry-run           # registry contact only
 python tools/npm-publish.py                     # publish for real
 python tools/npm-publish.py --token-file path/to/token.txt
 ```
+
+## smoke-parse.mjs
+
+Parses every `.mmpform` in a target directory through the public
+`TextFormBuilder` and reports per-file tooltip counts. Use it from
+any consumer that ships a manifest folder (Core's pipeline manifests,
+Sinks' per-sink forms, etc.) to confirm an edit didn't break the
+grammar before the bytes reach the dashboard.
+
+```bash
+node tools/smoke-parse.mjs ../Core/manifests/pipeline
+node tools/smoke-parse.mjs ../Herald.Sinks/SignalFx/manifests
+```
+
+Exits non-zero on any parse failure, so it slots cleanly into a
+pre-commit hook or CI step. Probes `result.payload.tooltips` (the
+post-rewrite tooltip map); `_rawTooltips` is a parser scratch field
+deleted before the model is returned.
 
 ## Typical workflow
 
