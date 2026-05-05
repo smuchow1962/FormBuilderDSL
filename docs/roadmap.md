@@ -86,3 +86,48 @@ The viewer wires semantic `<label>` elements with `aria-labelledby`, `role="grou
 ### Form-state diff / undo across edits
 
 Vue's reactive proxy already gives the change events; a wrapper history-stack on the viewer would handle undo/redo without touching the package. Cost: small to medium.
+
+---
+
+## Edition / tier awareness on controls
+
+A consumer surfaced this when planning a configuration UI where some fields are unlocked only above a certain product tier (Community / Pro / Enterprise). The current grammar has no first-class way for a control to declare "this field requires Pro" — the consumer has to either pre-filter the `.mmpform` text server-side or wrap the rendered output in conditional Vuetify shell.
+
+Sketch of what would land:
+
+```dsl
+- [number(4,{maxBatchDelayMs}, tier="Pro", tierPitch="Pro unlocks larger-batch tuning.")] Max delay (ms)
+
+[container("Audit chain", tier="Enterprise")]
+  - [textfield(12,{auditPath})] Audit file path
+  - [check(3,{verifyOnLoad})] Verify on load
+```
+
+Two attributes on either a control or a container:
+
+- `tier="Community" | "Pro" | "Enterprise"` — minimum edition for the control to be enabled.
+- `tierPitch="..."` — short text shown in a tooltip or hover when the running edition is below the tier. Kept short on purpose; longer pitches belong in the consumer's diagnostics surface.
+
+The renderer reads the running edition from a context variable (`tier` on the form's data, like the existing `{path}` bindings) and either disables the control with the pitch as tooltip, or hides it entirely if the consumer prefers (a `tierMode="disabled" | "hidden"` config knob at the form level). The trust story is the same as `evaluateWhen` — `tier` is a plain string compared against a known set, no expression evaluation involved.
+
+Why this is worth landing:
+
+1. The pattern shows up in any commercial product with capability-based tiering. Today every consumer reinvents it.
+2. Tier-locked fields in the DSL surface read as part of the form, not as a separate concern bolted on top — operators see the *full* set of capabilities and what they'd unlock by upgrading, which is product-shaped feedback (see Herald's Dashboard plan, where this drives the per-step picker).
+3. The cost is small. New attribute, one render-time check, one new context variable. No grammar surgery; `tier=...` slots in next to `tt=...` and `when=...` as just another control parameter.
+
+Open questions:
+
+1. **Granularity.** Do we honour `tier` only on controls, or also on containers (whole panel disabled), top-level form (whole form gated), or `listManager` add-button (can't add new entries above the tier)? Container-level is the natural extension; list-manager-level is the trickier case worth considering.
+2. **Multiple tier dimensions.** Today the example assumes a single edition axis. Some products have orthogonal axes (free vs paid × on-prem vs cloud). The DSL could either restrict `tier` to a single string or accept a comma-separated set. Restrict to single until a consumer asks for more.
+3. **How the renderer surfaces "would unlock."** A grey-with-tooltip shape is the simplest. A dedicated `<aside>` panel listing all tier-locked fields with their pitches is what some product UIs prefer. The DSL stays out of this — consumer's choice via the rendered output.
+
+Cost: small. New ParamSpec entry, one renderer hook, one context variable, tests for the disabled-vs-hidden modes. Trust story is unchanged. AST versioning bump if the consumer wants to round-trip the attribute through scaffolds.
+
+### API-sourced option lists (adjacent)
+
+Today every option source in a `select` / `combo` / `listManager` is a literal array (`["log", "ndjson", "csv"]`) or an alias to one. Consumers who want options that come from a server endpoint at form-render time work around it via `compute={@function}` — but `compute` evaluates against the form's data, not against a fetch.
+
+The cleaner shape lands once **Form-state lifecycle hooks** (above) ship: an `onLoad` hook that runs before the form renders, returns a value, and binds it to a state variable that an option source then reads. That gives the DSL one hook for "fill in things that come from outside" rather than splitting fetch concerns from compute concerns.
+
+Until lifecycle hooks land, the workaround is the consumer pre-renders the option list into the `.mmpform` text server-side. That's not pretty but it works for the dashboard's needs today.
