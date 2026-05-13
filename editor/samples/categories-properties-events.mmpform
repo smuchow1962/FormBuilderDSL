@@ -109,17 +109,17 @@ ansiColors = ["", "black", "red", "green", "yellow", "blue", "magenta", "cyan", 
           | [check(3,{underline})] Underline
           | [check(3,{strike})] Strikethrough
 
-  2. Properties
+  2. Enrichers
       - [listManager({properties},
           minHeight="800px",
           maxHeight="800px",
           search=true,
           filter="name",
-          addLabel="Add Property",
+          addLabel="Add Enricher",
           commit={@commitProperties},
           excluded=#defaultProperties
         )]
-          - [textfield(12,{name},init="new property")] Name
+          - [textfield(12,{name},init="new enricher")] Name
           - [textfield(12,{alias})] Display Name
           - [select(12,#propType,{type},init="string")] Type
           - [textfield(12,{description})] Description
