@@ -78,8 +78,15 @@ propType   = ["string", "number", "boolean", "datetime", "array", "object"] -> {
 ansiColors = ["", "black", "red", "green", "yellow", "blue", "magenta", "cyan", "white", "gray"] -> {fgAnsi}
 
 # ── The form ────────────────────────────────────────────────────
+#
+# Panel widths intentionally sum to more than the 12-column total
+# (1:12,2:12,3:12). MmpformVuetifyRenderer.renderContainerBody falls
+# back to v-expansion-panels (accordion) when the panels can't fit a
+# single row. That gives one-section-at-a-time editing instead of
+# three side-by-side columns — the cognitive-load fix that drove the
+# Dashboard appearance editor redesign.
 
-[container(panels=[1:4,2:4,3:4])]
+[container(panels=[1:12,2:12,3:12])]
   1. Levels
     - [listManager({levels},
         minHeight="800px",
@@ -92,6 +99,7 @@ ansiColors = ["", "black", "red", "green", "yellow", "blue", "magenta", "cyan", 
         excluded=#defaultLevels
       )]
         - [textfield(12,{name},init="new level")] Name
+        - [textfield(12,{alias})] Display Name
         - [select(3,#ansiColors,{fgAnsi})] FG ANSI
           | [select(3,#ansiColors,{bgAnsi})] BG ANSI
           | [color(3,{fg})] FG Custom
@@ -112,6 +120,7 @@ ansiColors = ["", "black", "red", "green", "yellow", "blue", "magenta", "cyan", 
           excluded=#defaultProperties
         )]
           - [textfield(12,{name},init="new property")] Name
+          - [textfield(12,{alias})] Display Name
           - [select(12,#propType,{type},init="string")] Type
           - [textfield(12,{description})] Description
 
@@ -126,6 +135,7 @@ ansiColors = ["", "black", "red", "green", "yellow", "blue", "magenta", "cyan", 
           excluded=#defaultCategories
         )]
           - [textfield(12,{name},init="new category")] Name
+          - [textfield(12,{alias})] Display Name
           - [color(6,{fg},init="#61afef")] Foreground
           - [color(6,{bg},init="#13151a")] Background
           - [textfield(12,{description})] Description
