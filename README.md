@@ -416,11 +416,29 @@ The full documentation lives in the
 The published npm package ships only what consumers need at runtime:
 the parser, the public types, and a README. The full test suite
 (parser, tokenizer, expression-trust, golden-AST, property-
-collection, audit-resolution + coverage-fill files, plus the
-`smoke.js` and `properties.js` integration harnesses) lives in the
-GitHub repository at
+collection, audit-resolution + coverage-fill files, the fuzz layer
+under `tests/fuzz/`, plus the `smoke.js` and `properties.js`
+integration harnesses) lives in the GitHub repository at
 [`tests/`](https://github.com/smuchow1962/FormBuilderDSL/tree/main/tests)
 and is intentionally not shipped in the npm tarball.
+
+### The fuzz layer
+
+`tests/fuzz/` runs roughly 100,000 generated cases per suite run,
+covering the tokenizer, parser, `when=` evaluator, `interpolate`, and
+the parse → walk → render round trip. Every case is drawn from a
+fixed-seed PRNG (a small mulberry32 in `tests/fuzz/random.js`, no
+extra dependency), so a failure is always reproducible and a red run
+reports the seed, the iteration, and the offending input.
+
+The properties are deliberately sharper than "it didn't crash":
+untrusted input may return a value or raise the library's own
+`ParseError`, and nothing else — a `TypeError` escaping the tokenizer
+is a finding. The parser is additionally held to never returning
+`INTERNAL_ERROR`, which by definition means an unhandled exception
+rather than a diagnosed input problem. The evaluator and interpolator
+are checked for prototype pollution after every batch. Run the layer
+on its own with `npm run test:fuzz`.
 
 The runner is [Jest](https://jestjs.io/). The package is pure ESM and
 ships untranspiled, so Jest runs it as native ES modules with no Babel
