@@ -14,9 +14,8 @@
 //   A-D5   Future-feature roadmap section moved out of
 //          expression-trust.md into docs/roadmap.md.
 //   A-D6   architecture.md mentions the safe-keys.js Proxy.
-//   A-D7   README coverage thresholds cross-reference package.json:c8.
+//   A-D7   README coverage thresholds cross-reference jest.config.js.
 
-import test from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -155,8 +154,11 @@ test("A-D6 architecture.md §10 names the safe-keys.js Proxy guarantee", () => {
 
 // ─── A-D7 README coverage threshold mirror note ──────────────────────────
 
-test("A-D7 README cross-references package.json:c8 for the coverage thresholds", () => {
+test("A-D7 README cross-references the runner config for the coverage thresholds", () => {
+    // Same intent as always — the README's threshold table must name the
+    // file the gate actually reads. That file moved from package.json:c8
+    // to jest.config.js when the suite migrated to Jest.
     const text = readDoc('README.md');
-    assert.ok(text.includes('package.json:c8'),
-        'README should mirror the threshold table to package.json:c8');
+    assert.ok(text.includes('jest.config.js:coverageThreshold.global'),
+        'README should mirror the threshold table to jest.config.js:coverageThreshold.global');
 });

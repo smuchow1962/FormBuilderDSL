@@ -1,4 +1,3 @@
-import test from 'node:test';
 import assert from 'node:assert/strict';
 import { TYPE_BY_CONTROL } from '../src/infer-schema.js';
 import { DEFAULT_DATA_TYPE_BY_CONTROL } from '../src/control-spec.js';

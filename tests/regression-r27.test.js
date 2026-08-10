@@ -23,7 +23,6 @@
 //   S1   sample-files.test.js auto-discovers every .mmpform under
 //        editor/samples/ and registers a per-file parse + infer-schema test.
 
-import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';

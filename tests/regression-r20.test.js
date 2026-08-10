@@ -23,7 +23,6 @@
 //          (apostrophes inside values now round-trip through
 //          JSON.parse).
 
-import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';

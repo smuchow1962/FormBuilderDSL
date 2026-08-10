@@ -19,7 +19,6 @@
 //   5.6   Nested arrays in __properties default raise PARSE_ERROR.
 //   safeGet helper covered.
 
-import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import {

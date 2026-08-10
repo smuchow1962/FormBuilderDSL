@@ -8,7 +8,6 @@
 //        (project coding rule). Behaviour unchanged.
 //   D5   architecture.md cross-references no-AST-caching from §7.
 
-import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';

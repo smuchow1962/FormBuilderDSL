@@ -13,7 +13,6 @@
 //   m7-a __properties default mismatch raises PARSE_ERROR for known types.
 //   Q8.5 maxNestingDepth option overrides the default of 16.
 
-import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import {

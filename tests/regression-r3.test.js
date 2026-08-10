@@ -13,7 +13,6 @@
 //   3.3  columns: 0 and columns: -N raise INVALID_PARAM.
 //   3.4  parseDecorated accepts `\\` as a literal backslash.
 
-import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import {

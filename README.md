@@ -422,12 +422,17 @@ GitHub repository at
 [`tests/`](https://github.com/smuchow1962/FormBuilderDSL/tree/main/tests)
 and is intentionally not shipped in the npm tarball.
 
-Coverage is measured with [`c8`](https://github.com/bcoe/c8) and
-gated in CI by `npm run test:coverage:check`. `npm test` itself
-runs the unit / smoke / properties suite without invoking `c8`, so
-a developer iterating locally does not pay the coverage-instrument
-cost on every run. The threshold gate is a separate command and is
-what CI executes to decide whether a build passes.
+The runner is [Jest](https://jestjs.io/). The package is pure ESM and
+ships untranspiled, so Jest runs it as native ES modules with no Babel
+step (`transform: {}` in `jest.config.js`); the npm scripts invoke Jest
+through `node --experimental-vm-modules` so the same command works on
+Windows and POSIX shells alike.
+
+Coverage is measured by Jest's v8 provider and
+gated in CI by `npm run test:coverage:check`. `npm test` itself runs the unit / smoke /
+properties suite without coverage, so a developer iterating locally does
+not pay the instrumentation cost on every run. The threshold gate is a
+separate command and is what CI executes to decide whether a build passes.
 
 Thresholds enforced by `npm run test:coverage:check`:
 
@@ -438,7 +443,7 @@ Thresholds enforced by `npm run test:coverage:check`:
 | Functions | 85% |
 | Statements | 85% |
 
-The numbers are mirrored in `package.json:c8` — that block is the configuration `c8 --check-coverage` reads. Bumping a threshold here means bumping the corresponding key under `c8` in `package.json` so the README and the gate stay in sync.
+The numbers are mirrored in `jest.config.js:coverageThreshold.global` — that block is the configuration Jest reads. Bumping a threshold here means bumping the corresponding key in `jest.config.js` so the README and the gate stay in sync.
 
 The Codecov badge at the top of this README shows the current
 achieved coverage. The numbers come from the GitHub repository, not

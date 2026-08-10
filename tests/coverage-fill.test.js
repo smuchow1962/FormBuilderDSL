@@ -2,7 +2,6 @@
 // exercise. Each block names the file + concern it's chasing, so a future
 // maintainer pruning duplicate coverage knows what to keep.
 
-import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import {

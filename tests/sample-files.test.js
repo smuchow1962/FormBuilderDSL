@@ -17,7 +17,6 @@
 // failures name the offending sample directly instead of hiding behind
 // a single rolled-up assertion.
 
-import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';

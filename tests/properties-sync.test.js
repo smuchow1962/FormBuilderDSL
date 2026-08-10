@@ -10,7 +10,6 @@
 // "my edit became stale on Process." The gate catches that case
 // and short-circuits the rewrite.
 
-import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import { TextFormBuilder } from '../src/index.js';

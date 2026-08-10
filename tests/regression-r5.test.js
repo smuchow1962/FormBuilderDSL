@@ -12,7 +12,6 @@
 //   5.1  Expression `foo..bar` raises PARSE_ERROR, not silent undef.
 //   5.2  parseDecorated colour lookup ignores prototype-only entries.
 
-import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import {

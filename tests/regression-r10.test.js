@@ -10,7 +10,6 @@
 //   5.6   inferDataSchema sources are sorted by line.
 //   Q8.3  VERSION export stays in sync with package.json.
 
-import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';

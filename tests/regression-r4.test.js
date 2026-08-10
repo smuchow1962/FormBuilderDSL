@@ -15,7 +15,6 @@
 //   5.9  renderFragments strict messages now mirror interpolate's.
 //   5.10 Panel width 0 is allowed; negative still rejected.
 
-import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import {

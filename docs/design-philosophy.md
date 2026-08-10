@@ -11,7 +11,7 @@ Where each property shows up here:
 - **Composable.** The control vocabulary is data, not code. A consumer adds a `json` control type with one entry in their spec; the parser does not gain a code path. Subpath imports let consumers pull just `interpolate` or `evaluateWhen` without loading the whole package.
 - **Unix philosophy.** Each file in `src/parser/` does one thing and does it well. The tokenizer just tokenizes. The parser just parses. `validate.js` validates. `layout-check.js` checks layout. `rewrite-fragments.js` rewrites text. None of them know what the others do beyond the shape they hand each other.
 - **Predictable.** Every public method that can fail returns a `TupleResponse`. There is exactly one branching point on the consumer side (`error === 0`) and one stable place to look for both data and messages.
-- **Idiomatic.** ES modules, JSDoc with `@throws` annotations, modern JavaScript (`Object.freeze`, `??`, optional chaining, destructuring). Tests use the built-in `node --test` runner. The codebase reads as plain JavaScript with no framework or build-step magic between source and runtime.
+- **Idiomatic.** ES modules, JSDoc with `@throws` annotations, modern JavaScript (`Object.freeze`, `??`, optional chaining, destructuring). Tests run on Jest, loading the package as native ES modules with no transpile step. The codebase reads as plain JavaScript with no framework or build-step magic between source and runtime.
 - **Domain-based.** The vocabulary in the AST and the source code matches the form-building domain: `control`, `container`, `panel`, `repeater`, `listManager`, `tooltipRef`, `optionsSource`, `binding`. A reader who understands forms understands the names.
 
 ## DRY

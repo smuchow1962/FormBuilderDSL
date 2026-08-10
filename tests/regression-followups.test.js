@@ -6,7 +6,6 @@
 // declared in the same .mmpform document. The only externally-
 // resolvable reference is {@function}.
 
-import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import {

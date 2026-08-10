@@ -1,4 +1,3 @@
-import test from 'node:test';
 import assert from 'node:assert/strict';
 import { LineSplitter, stripTrailingLineComment } from '../src/tokenizer.js';
 import { ParseError } from '../src/tuple-response.js';

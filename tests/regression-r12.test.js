@@ -25,7 +25,6 @@
 //        values, and named-text bodies. Round-trips verbatim through
 //        the symmetric reader / writer.
 
-import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import {

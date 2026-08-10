@@ -16,7 +16,6 @@
 //   m3   four newline shapes (\n, \r, \r\n, \n\r) all produce the
 //        same logical-line count.
 
-import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';

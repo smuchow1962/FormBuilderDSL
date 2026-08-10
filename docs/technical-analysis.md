@@ -264,9 +264,10 @@ Coverage gates in CI keep the boundaries honest:
 | Functions | 85% |
 | Statements | 85% |
 
-The test runner is the built-in `node --test`. No external test
-framework. No assertion library. Just `assert.equal`,
-`assert.deepEqual`, and the structure the runtime gives.
+The test runner is Jest, driving the package as native ES modules
+with no transpile step. Assertions stay on `node:assert/strict` —
+`assert.equal`, `assert.deepEqual` — so the suite reads as a
+behavioural spec rather than a matcher catalogue.
 
 ---
 

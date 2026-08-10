@@ -17,7 +17,6 @@
 // successful parses (token positions correct), parse errors (error
 // messages correct), and tokens that survive into AST `loc` fields.
 
-import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import { TextFormBuilder, ERR, errorName } from '../src/index.js';

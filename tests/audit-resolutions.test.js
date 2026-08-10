@@ -2,7 +2,6 @@
 // Each `test(...)` block names the audit item it covers so a future
 // maintainer can trace why the assertion exists.
 
-import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import {

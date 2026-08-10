@@ -18,7 +18,6 @@
 //   m9   parser.js carries the @internal note.
 //   CI   workflow runs lint, coverage:check, AND a Node 18/20/22 matrix.
 
-import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';

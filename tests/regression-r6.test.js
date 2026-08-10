@@ -23,7 +23,6 @@
 //   5.9  Bare ident `tru` / `falsey` / `nul` in object value -> PARSE_ERROR.
 //   5.10 EOF push counts against the maxTokens cap.
 
-import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import {

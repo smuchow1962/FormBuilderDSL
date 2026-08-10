@@ -9,7 +9,8 @@
 #   lint       — eslint over src/ + tests/. The repo's CODING_INSTRUCTIONS
 #                rule about named capture groups is enforced here too
 #                (any new regex without a named group fails the lint).
-#   coverage   — c8 with the thresholds declared in package.json. The
+#   coverage   — Jest's v8 coverage with the thresholds declared in
+#                jest.config.js. The
 #                README's "Tests + coverage" section names this as the
 #                gate that decides whether a build passes; this workflow
 #                runs it and uploads the resulting lcov report to
@@ -72,7 +73,7 @@ jobs:
       - name: Install
         run: npm ci
 
-      # The script enforces the package.json:c8 thresholds and emits an
+      # The script enforces the jest.config.js thresholds and emits an
       # lcov report in one pass. The threshold gate is what decides
       # pass/fail; the lcov report is what the next step uploads.
       - name: Coverage gate

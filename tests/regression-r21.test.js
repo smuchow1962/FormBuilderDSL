@@ -12,7 +12,6 @@
 //   C10  diffSchemas reports added / removed / changed.
 //   D1   json-internal-model.md is gone.
 
-import test from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';

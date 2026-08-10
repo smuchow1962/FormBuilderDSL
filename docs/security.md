@@ -374,7 +374,7 @@ The package's runtime dependencies are zero. Lockfile aside,
 |---|---|
 | `@eslint/js` | Lint rules |
 | `eslint` | Lint runner |
-| `c8` | Coverage measurement |
+| `jest` | Test runner + coverage measurement (v8 provider) |
 
 No test framework, no transform pipeline, no build step that
 would inject code into `src/`. The npm `prepack` hook runs

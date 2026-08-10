@@ -31,7 +31,6 @@
 //   W5   index.html ships the three undo buttons + edits-badge span.
 //   W6   viewer.css ships the .form-edits-badge rules.
 
-import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';

@@ -5,7 +5,6 @@
 //   C2 — renderForm round-trips a panels=[N:W] container.
 //   C3 — renderForm round-trips every documented value type.
 
-import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import { TextFormBuilder, ERR, renderForm, walkAst } from '../src/index.js';

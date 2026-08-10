@@ -25,7 +25,6 @@
 //        object: <reason>]" message instead of "[object Object]"
 //        when JSON.stringify throws.
 
-import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -150,10 +149,18 @@ test('m9 TupleResponse.fail with a serialisable object still produces JSON', () 
 
 // ─── M1 / M2 housekeeping (rename + glob) ────────────────────────────────
 
-test("M1 + M2 housekeeping: package.json test:unit uses a glob, not a hand-maintained list", () => {
+test("M1 + M2 housekeeping: test files are discovered by glob, not a hand-maintained list", () => {
+    // The intent this test has always pinned is "nobody hand-maintains a list
+    // of test files". Under the node:test runner that glob lived in the
+    // test:unit script; under Jest it lives in jest.config.js's testMatch, so
+    // the assertion follows the glob to its new home rather than relaxing.
     const pkg = JSON.parse(readDoc('package.json'));
-    assert.match(pkg.scripts['test:unit'], /tests\/\*\.test\.js/,
-        'test:unit should glob test files rather than enumerate them');
+    assert.equal(pkg.scripts['test:unit'].includes('.test.js'), false,
+        'test:unit should not enumerate individual test files');
     assert.equal(pkg.scripts['test:unit'].includes('principal-review-r'), false,
         'test:unit should not reference the old principal-review-rN names');
+
+    const jestConfig = readDoc('jest.config.js');
+    assert.match(jestConfig, /testMatch:\s*\['<rootDir>\/tests\/\*\*\/\*\.test\.js'\]/,
+        'jest.config.js should glob test files rather than enumerate them');
 });

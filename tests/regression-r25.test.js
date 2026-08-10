@@ -14,7 +14,6 @@
 //     coerceLiteral. Affects __properties block defaults and the
 //     control-side init= literal hoist.
 
-import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';

@@ -47,23 +47,13 @@
     "prepack": "node scripts/sync-version.mjs",
     "test": "npm run test:unit && node tests/smoke.js && node tests/properties.js",
     "lint": "eslint src tests",
-    "test:unit": "node --test tests/*.test.js",
+    "jest": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "test:unit": "npm run jest --",
+    "test:fuzz": "npm run jest -- tests/fuzz",
     "test:smoke": "node tests/smoke.js",
     "test:properties": "node tests/properties.js",
-    "test:coverage": "c8 --reporter=text --reporter=lcov --reporter=html npm test",
-    "test:coverage:check": "c8 --reporter=text --reporter=lcov --check-coverage npm test"
-  },
-  "c8": {
-    "all": true,
-    "include": ["src/**/*.js"],
-    "exclude": [
-      "src/version-generated.js"
-    ],
-    "reports-dir": "coverage",
-    "lines": 85,
-    "branches": 75,
-    "functions": 85,
-    "statements": 85
+    "test:coverage": "npm run jest -- --coverage",
+    "test:coverage:check": "npm run jest -- --coverage"
   },
   "keywords": [
     "form",
@@ -83,7 +73,7 @@
   "homepage": "https://github.com/smuchow1962/FormBuilderDSL#readme",
   "devDependencies": {
     "@eslint/js": "^9.39.2",
-    "c8": "^11.0.0",
-    "eslint": "^9.39.2"
+    "eslint": "^9.39.2",
+    "jest": "^30.4.2"
   }
 }

@@ -17,7 +17,6 @@
 //   5.7  parseDecorated honours mid-stream `r` reset.
 //   Q7   1 MB default input cap; `maxInputLength` option overrides it.
 
-import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import {

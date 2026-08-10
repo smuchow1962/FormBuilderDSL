@@ -18,7 +18,6 @@
 //   5.7  Expression-tokenizer error escapes special characters.
 //   v1   Named-object body rejects #name and nested objects.
 
-import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import {

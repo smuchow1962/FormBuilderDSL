@@ -14,7 +14,6 @@
 //   5.9  option-source value list accepts dates and null.
 //   5.10 typo'd block names get a "did you mean" hint.
 
-import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import {
