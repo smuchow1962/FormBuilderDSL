@@ -14,7 +14,7 @@ Pin a **version** instead of `@latest` when you care about stable builds.
 
 ```html
 <script type="module">
-  import { TextFormBuilder, ERR } from 'https://cdn.jsdelivr.net/npm/@mmpworks/formbuilder-dsl@1.0.1/+esm';
+  import { TextFormBuilder, ERR } from 'https://cdn.jsdelivr.net/npm/@mmpworks/formbuilder-dsl@1.0.2/+esm';
 
   const schemaText = `columns: 10
 [container({t})]
@@ -35,7 +35,7 @@ Notes:
 
 ```html
 <script type="module">
-  import { TextFormBuilder, ERR } from 'https://unpkg.com/@mmpworks/formbuilder-dsl@1.0.1/src/index.js?module';
+  import { TextFormBuilder, ERR } from 'https://unpkg.com/@mmpworks/formbuilder-dsl@1.0.2/src/index.js?module';
   // ... same as above
 </script>
 ```

@@ -420,7 +420,9 @@ collection, audit-resolution + coverage-fill files, the fuzz layer
 under `tests/fuzz/`, plus the `smoke.js` and `properties.js`
 integration harnesses) lives in the GitHub repository at
 [`tests/`](https://github.com/smuchow1962/FormBuilderDSL/tree/main/tests)
-and is intentionally not shipped in the npm tarball.
+and is intentionally not shipped in the npm tarball. As of v1.0.2 the
+suite stands at 43 Jest test files / 709 tests, with achieved coverage
+of roughly 94% statements and 87% branches against the thresholds below.
 
 ### The fuzz layer
 
